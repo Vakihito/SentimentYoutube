@@ -30,7 +30,7 @@ setup(
     keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning', 'Youtube'],
 
     license='MIT',
-    pakages=['SentimentYoutube'],
+    pakages='SentimentYoutube',
     install_requires=[
             'tensorflow==2.3.1',
             'ninja==1.10.0',
