@@ -27,6 +27,7 @@ setup(
     url='https://github.com/Vakihito/SentimentYoutube',
     author='Vakihito',
     athor_email='victor.kamada.tomita@gmail.com',
+    keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning', 'Youtube'],
 
     license='MIT',
     pakages=['SentimentYoutube'],
@@ -42,7 +43,6 @@ setup(
             'pytube3==9.6.0',    
             'textblob==0.15.3'    
             'scikit-learn>=0.21.3', # previously pinned to 0.21.3 due to TextPredictor.explain, but no longer needed as of 0.19.7
-            'matplotlib >= 3.0.0',
             'pandas >= 1.0.1',
             'fastprogress >= 0.1.21',
             'keras_bert>=0.86.0', # support for TF 2.3
