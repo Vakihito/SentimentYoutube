@@ -32,11 +32,11 @@ setup(
     license='MIT',
     pakages='SentimentYoutube',
     install_requires=[
+            'matplotlib==3.3.2',    
             'tensorflow==2.3.1',
             'ninja==1.10.0',
             'yacs==0.1.8',
             'cython==0.29.21',
-            'matplotlib==3.3.2',    
             'demjson==2.2.4',    
             'fasttext==0.9.1',    
             'opencv-python==4.4.0.44',    
