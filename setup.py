@@ -1,4 +1,4 @@
-from setuptools import setup
+import setuptools
 
 
 def readme():
@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 
-setup(
+setuptools.setup(
     version='0.0.1',
     name='SentimentYoutube',
     description='SentimentYoutube is a library that describes the feeling in through out the video, using keras',
@@ -30,7 +30,7 @@ setup(
     keywords = ['tensorflow', 'keras', 'deep learning', 'machine learning', 'Youtube'],
 
     license='MIT',
-    pakages='SentimentYoutube',
+    pakages=setuptools.find_packages(),
     install_requires=[
             'matplotlib==3.3.2',    
             'tensorflow==2.3.1',
