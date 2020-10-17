@@ -59,7 +59,6 @@ setup(
             'ipython',
             'syntok',
             'whoosh',
-            'git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI',
             'git+git://github.com/Vakihito/ktrain.git',
             'git+git://github.com/amaiya/eli5@tfkeras_0_10_1',
             'git+git://github.com/amaiya/stellargraph@no_tf_dep_082',

@@ -1,14 +1,14 @@
-tensorflow==2.3.1
-git+git://github.com/Vakihito/ktrain.git
-git+git://github.com/amaiya/eli5@tfkeras_0_10_1
-git+git://github.com/amaiya/stellargraph@no_tf_dep_082
-git+git://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI
-ninja==1.10.0
-yacs==0.1.8
-cython==0.29.21
-matplotlib==3.3.2
-demjson==2.2.4
-fasttext==0.9.1
-opencv-python==4.4.0.44
-pytube3==9.6.0
-textblob==0.15.3
+# tensorflow==2.3.1
+# git+git://github.com/Vakihito/ktrain.git
+# git+git://github.com/amaiya/eli5@tfkeras_0_10_1
+# git+git://github.com/amaiya/stellargraph@no_tf_dep_082
+# git+git://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI
+# ninja==1.10.0
+# yacs==0.1.8
+# cython==0.29.21
+# matplotlib==3.3.2
+# demjson==2.2.4
+# fasttext==0.9.1
+# opencv-python==4.4.0.44
+# pytube3==9.6.0
+# textblob==0.15.3
