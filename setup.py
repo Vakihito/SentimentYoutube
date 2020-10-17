@@ -41,7 +41,7 @@ setup(
             'fasttext==0.9.1',    
             'opencv-python==4.4.0.44',    
             'pytube3==9.6.0',    
-            'textblob==0.15.3'    
+            'textblob==0.15.3',    
             'scikit-learn>=0.21.3', # previously pinned to 0.21.3 due to TextPredictor.explain, but no longer needed as of 0.19.7
             'pandas >= 1.0.1',
             'fastprogress >= 0.1.21',
