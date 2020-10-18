@@ -410,7 +410,7 @@ yacs==0.1.8
 yellowbrick==0.9.1
 zict==2.0.0
 zipp==3.2.0
--e git+//github.com/Vakihito/ktrain.git@master
+-e git+//github.com/Vakihito/ktrain.git@master#egg=ktrain
 -e git+//github.com/amaiya/eli5@tfkeras_0_10_1
 -e git+//github.com/amaiya/stellargraph@no_tf_dep_082
 -e git+//github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI
