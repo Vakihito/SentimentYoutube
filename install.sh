@@ -26,7 +26,7 @@ sed -i '/torch/d' requirements.txt
 pip install -e .
 
 export PYTHONPATH=/content/pythia
-
+echo $PYTHONPATH
 
 
 cd /content/
@@ -46,6 +46,7 @@ cd /content/pythia
 
 
 export PYTHONPATH=/content/pythia
+echo $PYTHONPATH
 
 
 # Install maskrcnn-benchmark to extract detectron features
@@ -58,6 +59,7 @@ python setup.py develop
 
 export PYTHONPATH=/content/vqa-maskrcnn-benchmark
 export PYTHONPATH=/content  
+echo $PYTHONPATH
 
 !wget http://nlp.stanford.edu/data/glove.6B.zip
 
