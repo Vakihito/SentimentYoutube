@@ -61,8 +61,13 @@ export PYTHONPATH=/content/vqa-maskrcnn-benchmark
 export PYTHONPATH=/content  
 echo $PYTHONPATH
 
-!wget http://nlp.stanford.edu/data/glove.6B.zip
+wget http://nlp.stanford.edu/data/glove.6B.zip
 
-!mkdir -p /content/pythia/.vector_cache/
-!mv glove.6B.zip /content/pythia/.vector_cache/
+mkdir -p /content/pythia/.vector_cache/
+mv glove.6B.zip /content/pythia/.vector_cache/
+
+
+mv /content/SentimentYoutube/SentimentYoutube /content/vqa-maskrcnn-benchmark
+mv /content/pythia /content/vqa-maskrcnn-benchmark
+
 
