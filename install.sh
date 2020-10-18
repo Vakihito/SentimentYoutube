@@ -22,10 +22,10 @@ cd /content/pythia
 sed -i '/torch/d' requirements.txt
 pip install -e .
 
-
+python3
 import sys
 sys.path.append('/content/pythia')
-
+exit()
 
 # Install maskrcnn-benchmark to extract detectron features
 cd /content
@@ -34,10 +34,15 @@ cd /content/vqa-maskrcnn-benchmark
 # Compile custom layers and build mask-rcnn backbone
 python setup.py build
 python setup.py develop
+
+python3
+import sys
 sys.path.append('/content/vqa-maskrcnn-benchmark')
 
 
 sys.path.append('/content')
+exit()
+
 !wget http://nlp.stanford.edu/data/glove.6B.zip
 
 !mkdir -p /content/pythia/.vector_cache/

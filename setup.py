@@ -31,8 +31,7 @@ setuptools.setup(
 
     license='MIT',
     pakages=setuptools.find_packages(),
-    install_requires=[
-            'matplotlib==3.3.2',    
+    install_requires=[    
             'tensorflow==2.3.1',
             'ninja==1.10.0',
             'yacs==0.1.8',
