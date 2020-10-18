@@ -25,7 +25,6 @@ cd /content/pythia
 sed -i '/torch/d' requirements.txt
 pip install -e .
 
-python3
 import sys
 sys.path.append('/content/pythia')
 exit()
@@ -48,7 +47,6 @@ cp -afxr mmf-0.3/pythia /content/pythia
 cd /content/pythia
 
 
-import sys
 sys.path.append('/content/pythia')
 exit()
 
@@ -61,11 +59,8 @@ cd /content/vqa-maskrcnn-benchmark
 python setup.py build
 python setup.py develop
 
-python3
-import sys
+
 sys.path.append('/content/vqa-maskrcnn-benchmark')
-
-
 sys.path.append('/content')
 exit()
 
