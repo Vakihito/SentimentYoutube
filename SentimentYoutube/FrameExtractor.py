@@ -1,6 +1,7 @@
 from pytube import YouTube
 from textblob import TextBlob
 from pytube.helpers import safe_filename
+import numpy as np
 import math
 import os
 import shutil
@@ -9,7 +10,11 @@ import datetime
 import matplotlib.pyplot as plt
 from matplotlib import rc
 import cv2
-from . import PythiaDemo
+from .frame_caption import frame_caption
+from .frame_struct import frame_struct
+from .caption_struct import caption_struct
+from .utils import *
+
 
 class FrameExtractor():
     '''

@@ -1,3 +1,8 @@
+from .utils import predict_face, predict_text
+from PIL import Image
+from IPython.display import display
+
+
 class frame_struct():
     '''
       saves the frame time in seconds (int), 
@@ -9,9 +14,9 @@ class frame_struct():
       self.time = timeF
       self.path = pathF
       self.description = desciptionF
-      prob_ktrain = predictor_text.predict(self.description, return_proba=True)
+      prob_ktrain = predict_text(self.description, return_proba=True)
       self.feeling = prob_ktrain[1] - prob_ktrain[0]  # has atributes polarity and subjectivity
-      self.feeling_ktrain = predictor_face.predict_filename(self.path)[0] - 1
+      self.feeling_ktrain = predict_face(self.path)[0] - 1
     
     def show_img(self):
       img = Image.open(self.path)

@@ -1,3 +1,4 @@
+from .utils import predict_text
 class caption_struct():
     '''
         saves the caption as a struct with start, as a int and end as a int 
@@ -10,7 +11,7 @@ class caption_struct():
 
     #   self.feeling = TextBlob(self.caption).sentiment # has atributes polarity and subjectivity
       
-      prob_ktrain = predictor_text.predict(self.caption, return_proba=True)
+      prob_ktrain = predict_text(self.caption, return_proba=True)
       self.feeling = (prob_ktrain[1] - prob_ktrain[0]) 
       
 
