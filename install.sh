@@ -67,7 +67,7 @@ mkdir -p /content/pythia/.vector_cache/
 mv glove.6B.zip /content/pythia/.vector_cache/
 
 
-# mv /content/SentimentYoutube/SentimentYoutube /content/vqa-maskrcnn-benchmark
-# mv /content/pythia /content/vqa-maskrcnn-benchmark
+mv /content/SentimentYoutube/SentimentYoutube /content/vqa-maskrcnn-benchmark
+mv /content/pythia /content/vqa-maskrcnn-benchmark
 
-
+cd /content/vqa-maskrcnn-benchmark

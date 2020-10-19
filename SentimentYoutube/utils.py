@@ -9,7 +9,9 @@ import datetime
 import matplotlib.pyplot as plt
 from matplotlib import rc
 import cv2
+from IPython.display import display
 from . import PythiaDemo
+from . import FrameExtractor
 
 def average(lista):
   if len(lista) == 0:
@@ -26,7 +28,7 @@ def string_time_int(str_time):
     segundos += 3600 * int(str_time[:-6])
     return segundos
 
-def show_prediction(ulr):
+def show_prediction(ulr,demo):
     tokens = demo.predict(ulr)
     answer = demo.caption_processor(tokens.tolist()[0])["caption"]
     return answer
