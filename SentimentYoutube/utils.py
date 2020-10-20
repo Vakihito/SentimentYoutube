@@ -1,4 +1,6 @@
 from PIL import Image
+import requests
+from io import BytesIO
 import math
 import os
 import shutil
@@ -10,7 +12,7 @@ from IPython.display import display
 import ktrain
 from .PythiaDemo import PythiaDemo
 
-print("Loading pythia, this may take a while ...")
+print("Loading pythia, this may take a while ...\n\n")
 demo = PythiaDemo()
 
 print("Loading predictors for face analasys ...")
@@ -47,6 +49,13 @@ def show_prediction(ulr):
     tokens = demo.predict(ulr)
     answer = demo.caption_processor(tokens.tolist()[0])["caption"]
     return answer
+
+def show_image_url(ulr):
+    response = requests.get(ulr)
+    img = Image.open(BytesIO(response.content))
+    img.thumbnail((256,256), Image.ANTIALIAS)
+    display(img)
+    return img
 
 def show_image(path):
   img = Image.open(path)
