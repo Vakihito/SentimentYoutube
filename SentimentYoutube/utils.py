@@ -34,8 +34,8 @@ def predict_text(description, return_proba=True):
     return predictor_text.predict(description, return_proba=True)
 
 # Predicts a face in a image (positive or negative )
-def predict_face(description, return_proba=True):
-    return predictor_face.predict(description, return_proba=True)
+def predict_face(path, return_proba=True):
+    return predictor_face.predict_filename(path, return_proba=True)
 
 
 # gets the string time as HH:MM:SS and return in seconds
