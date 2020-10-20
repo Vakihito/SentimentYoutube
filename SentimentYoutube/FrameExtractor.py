@@ -465,3 +465,34 @@ class FrameExtractor():
         plt.ylabel('feeling')
         plt.title('time x feelling')
         plt.show()
+
+# does every preparation step before
+def do_preparation(id, lang='en', frames_t = 200):
+
+  ulr_to_download = 'https://www.youtube.com/watch?v=' + id
+  itag = 18
+
+  print("downloading the video from the ulr : ", ulr_to_download)
+  video = YouTube(ulr_to_download)
+  video.streams.get_by_itag(itag).download()
+
+  extractor_obj = FrameExtractor(video.title,id, frames_frequency=frames_t)
+  has_caption = False
+
+  for cap in video.captions.all():
+
+    if cap.code == lang:
+      has_caption = True
+      extractor_obj.has_caption = True
+
+  extractor_obj.just_extract(video,lang)
+  extractor_obj.normalize_sentiment();
+
+
+  # removing the movie
+  os.remove(extractor_obj.video_path)
+
+  # enviando os dados e tornando-os visíveis no drive
+
+
+  return extractor_obj   
