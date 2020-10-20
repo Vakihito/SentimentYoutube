@@ -58,4 +58,4 @@ This whole project was made in Google Colab, so Please use Google Colab nooteboo
 - Open the file SentimentYoutube : <code> cd SentimentYoutube/ </code> 
 - Install packages requirements: <code> !pip3 install -r requirements.txt </code> 
 - Install enviroment requirements: <code> ./install.sh </code> 
-- Thats all now you are good to go !!!
+- Thats all, now you are good to go !!!
