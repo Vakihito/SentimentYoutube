@@ -1,6 +1,6 @@
 
 
-### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples)  | [Installation](#installation)
+### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples)  | [Installation](#installation) | References(#references) 
 
 <p align="center">
 <img src="https://github.com/Vakihito/SentimentYoutube/blob/main/Logo.png?raw=true" width="100"/>
@@ -64,3 +64,11 @@ This whole project was made in Google Colab, so Please use Google Colab nooteboo
 - Install enviroment requirements: <code> ./install.sh </code> 
 - Open the enviroment file : <code> cd /content/vqa-maskrcnn-benchmark </code>
 - Thats all, now you are good to go !!!
+
+---
+
+### References
+- https://github.com/amaiya/ktrain
+- https://arxiv.org/abs/2004.10703
+- https://arxiv.org/pdf/1803.09820.pdf
+- https://arxiv.org/abs/1409.1556
