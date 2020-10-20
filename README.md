@@ -39,13 +39,21 @@ This library uses Ktrain in order to train models and load models, and also uses
 
 ### Tutorials
 Please see the following tutorial notebooks for a guide on how to use **SentimentYoutube** on your projects:
-    * Tutorial 1: [Introduction](https://colab.research.google.com/drive/1fZRv3pJA1Ie4H18zQugmAkDZdZ1usoHv?authuser=1#scrollTo=U4CASaopTpK-)
+    - Tutorial 1: [Introduction](https://colab.research.google.com/drive/1fZRv3pJA1Ie4H18zQugmAkDZdZ1usoHv?authuser=1#scrollTo=U4CASaopTpK-)
 
 ---
 ### Examples
 Please see the following examples notebooks for a guide on how to use **SentimentYoutube** on your projects:
-    * how to use : [Introduction](https://colab.research.google.com/drive/1fZRv3pJA1Ie4H18zQugmAkDZdZ1usoHv?authuser=1#scrollTo=U4CASaopTpK-)
+    - how to use : [Introduction](https://colab.research.google.com/drive/1fZRv3pJA1Ie4H18zQugmAkDZdZ1usoHv?authuser=1#scrollTo=U4CASaopTpK-)
 
 ---
 
 ### Installation
+This whole project was made in Google Colab, so Please use Google Colab nootebook in order to make this operantion work, other wise you may check our install.sh an change the paths to your liking, but I wouldn't suggest doing so...
+    - First of all make sure that you are using *GPU* enviroment.
+    - Than open the file content : <code> cd /content </code>
+    - Clone the git repository: <code> !git clone https://github.com/Vakihito/SentimentYoutube.git </code> 
+    - Open the file SentimentYoutube : <code> cd SentimentYoutube/ </code> 
+    - Install packages requirements: <code> !pip3 install -r requirements.txt </code> 
+    - Install enviroment requirements: <code> ./install.sh </code> 
+    - Thats all now you are good to go !!!
