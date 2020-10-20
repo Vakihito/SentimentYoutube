@@ -20,7 +20,7 @@ class FrameExtractor():
     '''
     Class used for extracting frames from a video file.
     '''
-    def __init__(self, video_name, video_id, video_path="/content/vqa-maskrcnn-benchmark/", video_dir="./dataset/", frames_frequency=200):
+    def __init__(self, video_name, video_id, video_path="/content/vqa-maskrcnn-benchmark/", video_dir="/content/vqa-maskrcnn-benchmark/dataset/", frames_frequency=200):
         self.video_name = safe_filename(video_name)
         self.video_id = video_id
         self.video_path = video_path + self.video_name + ".mp4"
@@ -468,6 +468,9 @@ class FrameExtractor():
 
 # does every preparation step before
 def do_preparation(id, lang='en', frames_t = 200):
+  if not os.path.isdir("/content/vqa-maskrcnn-benchmark/dataset/"):
+            os.mkdir("/content/vqa-maskrcnn-benchmark/dataset/")
+            print(f'Created the following directory: /content/vqa-maskrcnn-benchmark/dataset/')
 
   ulr_to_download = 'https://www.youtube.com/watch?v=' + id
   itag = 18
