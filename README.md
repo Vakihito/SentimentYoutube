@@ -43,8 +43,8 @@ Please see the following tutorial notebooks for a guide on how to use **Sentimen
 
 ---
 ### Examples
-
-
+Please see the following examples notebooks for a guide on how to use **SentimentYoutube** on your projects:
+    * how to use : [Introduction](https://colab.research.google.com/drive/1fZRv3pJA1Ie4H18zQugmAkDZdZ1usoHv?authuser=1#scrollTo=U4CASaopTpK-)
 ---
 
 ### Installation
