@@ -2,6 +2,10 @@
 
 ### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples)  | [Installation](#installation)
 
+<p align="center">
+<img src="https://github.com/Vakihito/SentimentYoutube/blob/main/Logo.png?raw=true" width="200"/>
+</p>
+
 
 # Welcome to SentimentYoutube
 
