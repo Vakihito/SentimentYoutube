@@ -44,13 +44,13 @@ This library uses Ktrain in order to train models and load models, and also uses
 ### Tutorials
 Please see the following tutorial notebooks for a guide on how to use **SentimentYoutube** on your projects:
     
-- **Tutorial 1**: [Introduction](https://colab.research.google.com/drive/1fZRv3pJA1Ie4H18zQugmAkDZdZ1usoHv?authuser=1#scrollTo=U4CASaopTpK-)
+- **Tutorial 1**: [Introduction](https://colab.research.google.com/drive/1EWV1Qss2IxqUReJe1GO4N0AyUviZGCeZ?authuser=1)
 
 ---
 ### Examples
 Please see the following examples notebooks for a guide on how to use **SentimentYoutube** on your projects:
     
-- **How to use** : [Introduction](https://colab.research.google.com/drive/1fZRv3pJA1Ie4H18zQugmAkDZdZ1usoHv?authuser=1#scrollTo=U4CASaopTpK-)
+- **How to use** : [Introduction](https://colab.research.google.com/drive/1EWV1Qss2IxqUReJe1GO4N0AyUviZGCeZ?authuser=1)
 
 ---
 
