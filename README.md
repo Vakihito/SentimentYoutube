@@ -61,7 +61,7 @@ This whole project was made in Google Colab, so Please use [Google Colab](https:
 - Clone the git repository: <code> !git clone https://github.com/Vakihito/SentimentYoutube.git </code> 
 - Open the file SentimentYoutube : <code> cd SentimentYoutube/ </code> 
 - Install packages requirements: <code> !pip3 install -r requirements.txt </code> 
-- Install enviroment requirements: <code> ./install.sh </code> 
+- Install enviroment requirements: <code> !./install.sh </code> 
 - Open the enviroment file : <code> cd /content/vqa-maskrcnn-benchmark </code>
 - Thats all, now you are good to go !!!
 
