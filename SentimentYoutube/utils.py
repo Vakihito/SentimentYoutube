@@ -12,14 +12,21 @@ from IPython.display import display
 import ktrain
 from .PythiaDemo import PythiaDemo
 
-print("Loading pythia, this may take a while ...\n\n")
-demo = PythiaDemo()
 
-print("Loading predictors for face analasys ...")
-predictor_face = ktrain.load_predictor('/content/sentiment_face')
 
-print("Loading predictors for text analasys ...")
-predictor_text = ktrain.load_predictor('/content/sentiment_text')
+def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_text'):
+  print("Loading pythia, this may take a while ...\n\n")
+  global demo
+  demo = PythiaDemo()
+
+  print("Loading predictors for face analasys ...\n")
+  global predictor_face
+  predictor_face = ktrain.load_predictor(face_dir)
+
+  print("Loading predictors for text analasys ...\n")
+  global predictor_text
+  predictor_text = ktrain.load_predictor(text_dir)
+
 
 def average(lista):
   if len(lista) == 0:

@@ -472,6 +472,8 @@ def do_preparation(id, lang='en', frames_t = 200):
             os.mkdir("/content/vqa-maskrcnn-benchmark/dataset/")
             print(f'Created the following directory: /content/vqa-maskrcnn-benchmark/dataset/')
 
+  load_models();
+
   ulr_to_download = 'https://www.youtube.com/watch?v=' + id
   itag = 18
 
