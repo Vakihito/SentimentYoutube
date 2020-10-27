@@ -186,6 +186,7 @@ kiwisolver==1.2.0
 knnimpute==0.1.0
 korean-lunar-calendar==0.2.1
 ktrain==0.21.4
+-e git+https://github.com/Vakihito/ktrain.git
 langdetect==1.0.8
 librosa==0.6.3
 lightgbm==2.2.3
