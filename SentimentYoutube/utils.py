@@ -16,7 +16,8 @@ model_load = False
 
 
 def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_text'):
-  if not model_load:
+  global model_load
+  if (not model_load):
     print("Loading pythia, this may take a while ...\n\n")
     global demo
     demo = PythiaDemo()
