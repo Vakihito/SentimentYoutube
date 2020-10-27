@@ -302,7 +302,7 @@ python-dateutil==2.8.1
 python-louvain==0.14
 python-slugify==4.0.1
 python-utils==2.4.0
-pytube==9.6.0
+pytube==9.6.4
 pytz==2018.9
 pyviz-comms==0.7.6
 PyWavelets==1.1.1
