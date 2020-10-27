@@ -75,6 +75,7 @@ cd /content
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1eBOKuaC32sZMzxZDNMUi9zWQZCzgED1i' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1eBOKuaC32sZMzxZDNMUi9zWQZCzgED1i" -O trained_models.zip && rm -rf /tmp/cookies.txt
 unzip trained_models.zip
 
+pip3 install yacs
 #open the correct dir to use
 cd /content/vqa-maskrcnn-benchmark
 
