@@ -186,7 +186,6 @@ kiwisolver==1.2.0
 knnimpute==0.1.0
 korean-lunar-calendar==0.2.1
 ktrain==0.21.4
--e git+https://github.com/Vakihito/ktrain.git
 langdetect==1.0.8
 librosa==0.6.3
 lightgbm==2.2.3
@@ -304,7 +303,6 @@ python-louvain==0.14
 python-slugify==4.0.1
 python-utils==2.4.0
 pytube==9.6.4
--e git+https://github.com/nficano/pytube.git
 pytz==2018.9
 pyviz-comms==0.7.6
 PyWavelets==1.1.1

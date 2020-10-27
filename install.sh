@@ -76,6 +76,8 @@ wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download
 unzip trained_models.zip
 
 pip3 install yacs
+pip3 install git+https://github.com/nficano/pytube.git
+pip3 install git+https://github.com/Vakihito/ktrain.git
 #open the correct dir to use
 cd /content/vqa-maskrcnn-benchmark
 
