@@ -20,11 +20,12 @@ class FrameExtractor():
     '''
     Class used for extracting frames from a video file.
     '''
-    def __init__(self, video_name, video_id, video_path="/content/vqa-maskrcnn-benchmark/", video_dir="/content/vqa-maskrcnn-benchmark/dataset/", frames_frequency=200):
+    def __init__(self, video_name, video_id,video_length ,video_path="/content/vqa-maskrcnn-benchmark/", video_dir="/content/vqa-maskrcnn-benchmark/dataset/", frames_frequency=200):
         self.video_name = safe_filename(video_name)
         self.video_id = video_id
         self.video_path = video_path + self.video_name + ".mp4"
         self.video_dir = video_dir + self.video_name  + self.video_id + "_dir"
+        self.video_len = video_lengths
         self.img_name = self.video_name + "_img"
 
         self.frames_frequency = frames_frequency
@@ -57,7 +58,7 @@ class FrameExtractor():
                 time_s = string_time_int(line_aux[0][:-4])
                 time_e = string_time_int(line_aux[1][:-4])
             # comment type
-            if (line_counter + 1) % 4  == 0:  
+            if (line_counter + 1) % 4  == 0 and self.video_len >= time_e:  
                 string_cap = line
                 self.captions_save.append(caption_struct(time_s, time_e, string_cap))
                 self.key_time.append(time_s)
@@ -481,7 +482,7 @@ def do_preparation(id, lang='en', frames_t = 200):
   video = YouTube(ulr_to_download)
   video.streams.get_by_itag(itag).download()
 
-  extractor_obj = FrameExtractor(video.title,id, frames_frequency=frames_t)
+  extractor_obj = FrameExtractor(video.title,id,video_length=video.length ,frames_frequency=frames_t)
   has_caption = False
 
   for cap in video.captions.all():
