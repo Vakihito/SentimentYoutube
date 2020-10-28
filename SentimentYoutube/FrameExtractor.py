@@ -484,7 +484,6 @@ def do_preparation(id, lang='en', frames_t = 200):
 
   extractor_obj = FrameExtractor(video.title,id,video_length=video.length ,frames_frequency=frames_t)
   has_caption = False
-
   for cap in video.captions.all():
 
     if cap.code == lang:
