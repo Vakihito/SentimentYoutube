@@ -25,7 +25,7 @@ class FrameExtractor():
         self.video_id = video_id
         self.video_path = video_path + self.video_name + ".mp4"
         self.video_dir = video_dir + self.video_name  + self.video_id + "_dir"
-        self.video_len = video_lengths
+        self.video_len = video_length
         self.img_name = self.video_name + "_img"
 
         self.frames_frequency = frames_frequency
