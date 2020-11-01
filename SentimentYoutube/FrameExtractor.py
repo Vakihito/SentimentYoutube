@@ -287,7 +287,9 @@ class FrameExtractor():
       
       if (not self.has_caption):
         weightfd = 1 - (weightf)
-        return ((somaF * weightf) + (somaFD * weightfd))
+        if not apart:
+            return ((somaF * weightf) + (somaFD * weightfd))
+        return (somaF, somaFD)
       
       for cap in self.captions_save:
         somaC += cap.feeling
@@ -417,7 +419,7 @@ class FrameExtractor():
         
         plt.plot(xF, yF, label="frame")
         plt.plot(xF, yFD, label="frame d")
-        plt.plot(xC, yT, label=  str(weightf * 100)  + " frame" + str(weightfd * 100)  + " frame d")
+        plt.plot(xF, yT, label=  str(weightf * 100)  + " frame" + str(weightfd * 100)  + " frame d")
 
 
         plt.xticks(np.arange(min(xF), max(xF)+1, 10.0))      
