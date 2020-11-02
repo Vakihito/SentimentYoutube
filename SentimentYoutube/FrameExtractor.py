@@ -25,7 +25,8 @@ class FrameExtractor():
         self.video_id = video_id
         self.video_path = video_path + self.video_name + ".mp4"
         self.video_dir = video_dir + self.video_name  + self.video_id + "_dir"
-        self.video_len = video_length
+        #i had some problens with the "bre0moeCMFU" , in wich pytube says it's 18s long , but it's 17's
+        self.video_len = video_length - 1
         self.img_name = self.video_name + "_img"
 
         self.frames_frequency = frames_frequency
