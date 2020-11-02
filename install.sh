@@ -81,8 +81,8 @@ pip3 install git+https://github.com/Vakihito/ktrain.git
 pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 
-!wget https://github.com/gopinath-balu/computer_vision/raw/master/CAFFE_DNN/res10_300x300_ssd_iter_140000.caffemodel
-!wget https://raw.githubusercontent.com/gopinath-balu/computer_vision/master/CAFFE_DNN/deploy.prototxt.txt
+wget https://github.com/gopinath-balu/computer_vision/raw/master/CAFFE_DNN/res10_300x300_ssd_iter_140000.caffemodel
+wget https://raw.githubusercontent.com/gopinath-balu/computer_vision/master/CAFFE_DNN/deploy.prototxt.txt
 #open the correct dir to use
 cd /content/vqa-maskrcnn-benchmark
 

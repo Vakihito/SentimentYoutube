@@ -17,7 +17,7 @@ from google.colab.patches import cv2_imshow
 model_load = False
 
 
-def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_text', net_model_dir="/content/vqa-maskrcnn-benchmark/res10_300x300_ssd_iter_140000.caffemodel",net_prototx_dir="/content/vqa-maskrcnn-benchmark/deploy.prototxt.txt"):
+def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_text', net_model_dir="/content/res10_300x300_ssd_iter_140000.caffemodel",net_prototx_dir="/content/deploy.prototxt.txt"):
   global model_load
   if (not model_load):
     print("Loading pythia, this may take a while ...\n\n")
