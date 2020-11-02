@@ -105,12 +105,12 @@ def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
 # Predicts a text (positive or negative )  
-def predict_text(description, return_prob=True):
-    return predictor_text.predict(description, return_proba=return_prob)
+def predict_text(description, return_proba=True):
+    return predictor_text.predict(description, return_proba=return_proba)
 
 # Predicts a face in a image (positive or negative )
-def predict_face(path, return_prob=True):
-    prob = predictor_face.predict_filename(path, return_proba=return_prob)[0]
+def predict_face(path, return_proba=True):
+    prob = predictor_face.predict_filename(path, return_proba=return_proba)[0]
     size_prob = len(prob)
     maxi = 0
     max_idx = -1
