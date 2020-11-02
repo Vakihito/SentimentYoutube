@@ -1,4 +1,4 @@
-from .utils import predict_face, predict_text
+from .utils import *
 from PIL import Image
 from IPython.display import display
 
@@ -21,7 +21,7 @@ class frame_struct():
       # use ktrain trained model to recognize feeling 
       self.face_prob = prop_of_having_face(self.path) 
       if (self.face_prob > probf):
-        self.feeling_ktrain = feeling_on_face(self.path)
+        self.feeling_ktrain = predict_face(self.path)
     
     def show_img(self):
       img = Image.open(self.path)
