@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 import cv2
 from IPython.display import display
+import os
+os.environ['DISABLE_V2_BEHAVIOR'] = '1' 
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 import ktrain
 import numpy as np
 from .PythiaDemo import PythiaDemo
