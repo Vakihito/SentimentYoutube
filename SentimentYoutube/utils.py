@@ -10,9 +10,6 @@ from matplotlib import rc
 import cv2
 from IPython.display import display
 import os
-os.environ['DISABLE_V2_BEHAVIOR'] = '1' 
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID";
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
 import ktrain
 import numpy as np
 from .PythiaDemo import PythiaDemo
@@ -20,6 +17,11 @@ from google.colab.patches import cv2_imshow
 
 model_load = False
 
+
+def set_os():
+  os.environ['DISABLE_V2_BEHAVIOR'] = '1' 
+  os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
+  os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_text', net_model_dir="/content/res10_300x300_ssd_iter_140000.caffemodel",net_prototx_dir="/content/deploy.prototxt.txt"):
   global model_load
