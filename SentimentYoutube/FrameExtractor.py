@@ -479,11 +479,22 @@ def do_preparation(id, lang='en', frames_t = 200):
   load_models();
 
   ulr_to_download = 'https://www.youtube.com/watch?v=' + id
-  itag = 18
+  
 
   print("downloading the video from the ulr : ", ulr_to_download)
   video = YouTube(ulr_to_download)
-  video.streams.get_by_itag(itag).download()
+
+  # chosing the stream of highest resolution that is mp4 
+  max_res = 0
+  itag_max = -1
+  for stream in video.streams.all():
+      if stream.resolution and max_res < (int)(stream.resolution[:-1]) and stream.mime_type == "video/mp4" :
+          max_res = (int)(stream.resolution[:-1])
+          itag_max = stream.itag 
+  video.streams.get_by_itag(str(itag_max)).download()
+
+
+
 
   extractor_obj = FrameExtractor(video.title,id,video_length=video.length ,frames_frequency=frames_t)
   has_caption = False

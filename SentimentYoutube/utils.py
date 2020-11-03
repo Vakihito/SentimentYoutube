@@ -38,7 +38,7 @@ def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_
     global net
     net = cv2.dnn.readNetFromCaffe(net_prototx_dir, net_model_dir)
 
-def prop_of_having_face(path,confidence_arg=0.8,show_img=False):
+def prop_of_having_face(path,confidence_arg=0.8,save_img=False,show_img=False,show_crop=False):
     image = cv2.imread(path)
     (h, w) = image.shape[:2]
     blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 1.0,
@@ -52,24 +52,43 @@ def prop_of_having_face(path,confidence_arg=0.8,show_img=False):
     net.setInput(blob)
     detections = net.forward()
 
-
+    crop_list = []
     certeza = 0
 
     # loop over the detections
-    for i in range(0, detections.shape[1]):
+    for i in range(0, detections.shape[2]):
         # extract the confidence (i.e., probability) associated with the
         # prediction
         confidence = detections[0, 0, i, 2]
         # filter out weak detections by ensuring the `confidence` is
         # greater than the minimum confidence
+        if certeza < confidence:
+                certeza = confidence
         if confidence > confidence_arg:
-            certeza = confidence
-            if(not show_img):
-                return confidence
             # compute the (x, y)-coordinates of the bounding box for the
             # object
             box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
             (startX, startY, endX, endY) = box.astype("int")
+
+
+            image_aux = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            # Make a copy of the original image to draw face detections on
+            image_copy = np.copy(image_aux)
+            # Convert the image to gray 
+            gray_image = cv2.cvtColor(image_copy, cv2.COLOR_RGB2GRAY)
+            
+            # Define the region of interest in the image  
+            face_crop = gray_image[startY:endY, startX:endX]
+            if (save_img):
+                print("image path:  " + path[:-4] + 'face_crop' + str(i) +'.jpg')
+                cv2.imwrite(path[:-4] + 'face_crop' + str(i) +'.jpg', face_crop)
+                crop_list.append(path[:-4] + 'face_crop' + str(i) +'.jpg')
+            if (show_crop):
+                plt.imshow(face_crop)
+                plt.show()
+
+
+
     
             # draw the bounding box of the face along with the associated
             # probability
@@ -81,16 +100,29 @@ def prop_of_having_face(path,confidence_arg=0.8,show_img=False):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
     # show the output image
 
+    image_aux = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
     if (show_img):
-        cv2_imshow( image)
-        cv2.waitKey(0)
-
+        plt.imshow(image_aux)
+        plt.show()
+    if (save_img):
+        return (crop_list,certeza)
     return certeza
 
-def explain_frame(path):
-    plt.imshow( predictor_face.explain(path) )
-    plt.show()
+def show_image(path):
+  img = Image.open(path)
+  img.thumbnail((256,256), Image.ANTIALIAS)
+  display(img)
+  return img
+
+def explain_frame(path, crop_faces=True):
+    show_image(path)
+    if (crop_faces):
+        (faces, _) = prop_of_having_face(path,save_img=True,show_img=True)
+    for face in faces:
+        plt.imshow( predictor_face.explain(face))
+        plt.show()
+        print("The feeling on this face is :", predictor_face.predict_filename(face)[0])
     frame_des = show_prediction(path)
     return predictor_text.explain(frame_des)
 def explain_text(text):
@@ -148,11 +180,6 @@ def show_image_url(ulr):
     display(img)
     return img
 
-def show_image(path):
-  img = Image.open(path)
-  img.thumbnail((256,256), Image.ANTIALIAS)
-  display(img)
-  return img
 
 # receives the seconds as a int and return a string in HH:MM:SS
 def seconds_to_time(sec):
