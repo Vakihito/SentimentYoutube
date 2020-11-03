@@ -16,7 +16,7 @@ class frame_struct():
       # keep the list of faces in a list
       (self.faces, self.face_prob) = prop_of_having_face(pathF,confidence_arg=probf,save_img=True)
       self.description = desciptionF
-      prob_ktrain = predictor_text.predict(self.description, return_proba=True)
+      prob_ktrain = predict_text(self.description, return_proba=True)
       self.feeling = prob_ktrain[1] - prob_ktrain[0]  
       
       self.feeling_ktrain = 0
