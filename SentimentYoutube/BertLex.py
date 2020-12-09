@@ -20,12 +20,12 @@ def get_bert_sent_features(inputs):
 
 
 
-def load_bert():
+def load_bert(DirPath):
     np.set_printoptions(threshold=100)
     logging.basicConfig(format='%(asctime)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S',level=logging.INFO,handlers=[LoggingHandler()])
 
     global language_model, dnn, df_lex 
-    language_model = SentenceTransformer('./language_model')
+    language_model = SentenceTransformer(DirPath + '/language_model')
 
 
     dnn = Sequential()
@@ -33,9 +33,9 @@ def load_bert():
     dnn.add(Dense(1))
     dnn.compile(loss='mse', optimizer='adam',metrics=['mse','mae'])
     dnn.summary()
-    dnn.load_weights('bert_lex_model/model.weights')
+    dnn.load_weights(DirPath + '/bert_lex_model/model.weights')
 
-    with open('df_lex.pickle', 'rb') as handle:
+    with open(DirPath + 'df_lex.pickle', 'rb') as handle:
         df_lex = pickle.load(handle)
     
 
