@@ -21,10 +21,11 @@ def get_bert_sent_features(inputs):
 
 
 def load_bert(DirPath):
+    global language_model, dnn, df_lex 
+
     np.set_printoptions(threshold=100)
     logging.basicConfig(format='%(asctime)s - %(message)s',datefmt='%Y-%m-%d %H:%M:%S',level=logging.INFO,handlers=[LoggingHandler()])
 
-    global language_model, dnn, df_lex 
     language_model = SentenceTransformer(DirPath + '/language_model')
 
 
@@ -37,18 +38,16 @@ def load_bert(DirPath):
 
     with open(DirPath + '/df_lex.pickle', 'rb') as handle:
         df_lex = pickle.load(handle)
-
-def return_bert_lex():
-    global df_lex
-    return df_lex
-
+   
+    X = np.array(df_lex['bert_features'].to_list())
+    df_lex['bert_lex_sent']=list(get_bert_sent_features(X))
 
 
 def get_bert_lex(text,lang='all',k=3, max_query=1.5):
   
   global df_lex
 
-  # global
+
   features = np.array([list(language_model.encode([text],show_progress_bar=False)[0])])
   features = get_bert_sent_features(features)
   df_lex['query'] = np.linalg.norm(np.array(list(df_lex['bert_lex_sent']))-features,axis=1)
