@@ -35,7 +35,7 @@ def load_bert(DirPath):
     dnn.summary()
     dnn.load_weights(DirPath + '/bert_lex_model/model.weights')
 
-    with open(DirPath + 'df_lex.pickle', 'rb') as handle:
+    with open(DirPath + '/df_lex.pickle', 'rb') as handle:
         df_lex = pickle.load(handle)
     
 
