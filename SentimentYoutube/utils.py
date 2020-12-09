@@ -16,6 +16,7 @@ from .PythiaDemo import PythiaDemo
 from google.colab.patches import cv2_imshow
 from .BertLex import load_bert
 from .BertLex import get_bert_lex
+from .BertLex import return_bert_lex
 
 model_load = False
 
@@ -44,6 +45,8 @@ def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_
 
     print("Loading model lexical Bert model...")
     load_bert('/content')
+
+    return return_bert_lex()
 
 def consent_values(sentiment_list):
     lista_sent = sentiment_list

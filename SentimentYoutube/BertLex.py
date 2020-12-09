@@ -37,7 +37,10 @@ def load_bert(DirPath):
 
     with open(DirPath + '/df_lex.pickle', 'rb') as handle:
         df_lex = pickle.load(handle)
-    print(df_lex)
+
+def return_bert_lex():
+    global df_lex
+    return df_lex
 
 
 
