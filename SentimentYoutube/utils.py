@@ -14,6 +14,8 @@ import ktrain
 import numpy as np
 from .PythiaDemo import PythiaDemo
 from google.colab.patches import cv2_imshow
+from .BertLex import load_bert
+from .BertLex import get_bert_lex
 
 model_load = False
 
@@ -39,6 +41,21 @@ def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_
     print("Loading model net model...")
     global net
     net = cv2.dnn.readNetFromCaffe(net_prototx_dir, net_model_dir)
+
+    print("Loading model lexical Bert model...")
+    load_bert()
+
+def consent_values(sentiment_list):
+    lista_sent = sentiment_list
+    size_lista = len(lista_sent)
+    for i in range(size_lista):
+        for j in range(size_lista):
+            if (i != j and (lista_sent[i] * lista_sent[j] < 0)):
+                return 0
+    return sum(lista_sent)
+
+def shift(seq, n):
+    return seq[n:]+seq[:n]
 
 def prop_of_having_face(path,confidence_arg=0.8,save_img=False,show_img=False,show_crop=False):
     image = cv2.imread(path)
@@ -81,11 +98,11 @@ def prop_of_having_face(path,confidence_arg=0.8,save_img=False,show_img=False,sh
             
             # Define the region of interest in the image  
             face_crop = gray_image[startY:endY, startX:endX]
-            if (save_img):
+            if save_img and len(face_crop) > 0 and len(face_crop[0]) > 0:
                 print("image path:  " + path[:-4] + 'face_crop' + str(i) +'.jpg')
                 cv2.imwrite(path[:-4] + 'face_crop' + str(i) +'.jpg', face_crop)
                 crop_list.append(path[:-4] + 'face_crop' + str(i) +'.jpg')
-            if (show_crop):
+            if (show_crop and face_crop):
                 plt.imshow(face_crop)
                 plt.show()
 
@@ -111,25 +128,6 @@ def prop_of_having_face(path,confidence_arg=0.8,save_img=False,show_img=False,sh
         return (crop_list,certeza)
     return certeza
 
-def show_image(path):
-  img = Image.open(path)
-  img.thumbnail((256,256), Image.ANTIALIAS)
-  display(img)
-  return img
-
-def explain_frame(path, crop_faces=True):
-    show_image(path)
-    if (crop_faces):
-        (faces, _) = prop_of_having_face(path,save_img=True,show_img=True)
-    for face in faces:
-        plt.imshow( predictor_face.explain(face))
-        plt.show()
-        print("The feeling on this face is :", predictor_face.predict_filename(face)[0])
-    frame_des = show_prediction(path)
-    return predictor_text.explain(frame_des)
-def explain_text(text):
-    return predictor_text.explain(text)
-
 def average(lista):
   if len(lista) == 0:
     return 0
@@ -138,9 +136,35 @@ def average(lista):
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
-# Predicts a text (positive or negative )  
-def predict_text(description, return_proba=True):
-    return predictor_text.predict(description, return_proba=return_proba)
+# gets the string time as HH:MM:SS and return in seconds
+def string_time_int(str_time):
+    segundos = int(str_time[-2:])
+    segundos += 60 * int(str_time[-5:-3])
+    segundos += 3600 * int(str_time[:-6])
+    return segundos
+
+def show_prediction(ulr):
+    tokens = demo.predict(ulr)
+    answer = demo.caption_processor(tokens.tolist()[0])["caption"]
+    return answer
+
+# receives the seconds as a int and return a string in HH:MM:SS
+def seconds_to_time(sec):
+  seconds = int(sec)
+  min = int(seconds / 60)
+  hours = int(min / 60)
+  min = min % 60
+  
+  hours = str(hours)
+  min = str(min)
+  seconds = str(sec % 60)
+  if len(hours) < 2 :
+    hours = '0' + hours
+  if len(min) < 2 :
+    min = '0' + min
+  if len(seconds) < 2:
+    sec = '0' + seconds
+  return hours + ':' + min + ':' + seconds
 
 # Predicts a face in a image (positive or negative )
 def predict_face(path, return_proba=True):
@@ -162,18 +186,38 @@ def predict_face(path, return_proba=True):
         return maxi
     return 0
 
+def IMDB(text, neutral_range=0.05):
 
-# gets the string time as HH:MM:SS and return in seconds
-def string_time_int(str_time):
-    segundos = int(str_time[-2:])
-    segundos += 60 * int(str_time[-5:-3])
-    segundos += 3600 * int(str_time[:-6])
-    return segundos
+    prob_ktrain = predictor_text.predict(text, return_proba=True)
+    feeling = (prob_ktrain[1] - prob_ktrain[0]) 
+    if feeling < neutral_range and -neutral_range < feeling:
+        feeling = 0
+    return feeling
 
-def show_prediction(ulr):
-    tokens = demo.predict(ulr)
-    answer = demo.caption_processor(tokens.tolist()[0])["caption"]
-    return answer
+def Bert(text, only_sentiment=True, max_query=1.5, neutral_range=0.05):
+
+
+    (df_lexico_result , sentiment) = get_bert_lex(text,k=15,max_query=max_query)
+    if sentiment < neutral_range and -neutral_range < sentiment:
+          sentiment = 0
+    if only_sentiment:
+        return sentiment
+    return (df_lexico_result , sentiment)
+
+# predicts text
+def predict_text(text, method="IMDB", only_sentiment=True, max_query=1.5, neutral_range=0.05):
+    if method == "IMDB":
+        return IMDB(text,neutral_range)
+    if method == "Bert":
+        return Bert(text, only_sentiment, max_query, neutral_range)    
+    print("method do not exists...")
+    return 0
+
+def show_image(path):
+  img = Image.open(path)
+  img.thumbnail((256,256), Image.ANTIALIAS)
+  display(img)
+  return img
 
 def show_image_url(ulr):
     response = requests.get(ulr)
@@ -183,20 +227,22 @@ def show_image_url(ulr):
     return img
 
 
-# receives the seconds as a int and return a string in HH:MM:SS
-def seconds_to_time(sec):
-  seconds = int(sec)
-  min = int(seconds / 60)
-  hours = int(min / 60)
-  min = min % 60
-  
-  hours = str(hours)
-  min = str(min)
-  seconds = str(sec % 60)
-  if len(hours) < 2 :
-    hours = '0' + hours
-  if len(min) < 2 :
-    min = '0' + min
-  if len(seconds) < 2:
-    sec = '0' + seconds
-  return hours + ':' + min + ':' + seconds
+## this functions should not be used for now ##
+
+
+# def explain_frame(path, crop_faces=True):
+#     show_image(path)
+#     if (crop_faces):
+#         (faces, _) = prop_of_having_face(path,save_img=True,show_img=True)
+#     for face in faces:
+#         plt.imshow( predictor_face.explain(face))
+#         plt.show()
+#         print("The feeling on this face is :", predictor_face.predict_filename(face)[0])
+#     frame_des = show_prediction(path)
+#     return predictor_text.explain(frame_des)
+
+## this functions should not be used for now ##
+
+
+# def explain_text(text):
+#     return predictor_text.explain(text)

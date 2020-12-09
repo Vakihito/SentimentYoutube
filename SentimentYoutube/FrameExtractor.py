@@ -25,8 +25,7 @@ class FrameExtractor():
         self.video_id = video_id
         self.video_path = video_path + self.video_name + ".mp4"
         self.video_dir = video_dir + self.video_name  + self.video_id + "_dir"
-        #i had some problens with the "bre0moeCMFU" , in wich pytube says it's 18s long , but it's 17's
-        self.video_len = video_length - 1
+        self.video_len = video_length
         self.img_name = self.video_name + "_img"
 
         self.frames_frequency = frames_frequency
@@ -34,6 +33,7 @@ class FrameExtractor():
         self.n_frames = int(self.vid_cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.fps = int(self.vid_cap.get(cv2.CAP_PROP_FPS))
 
+        self.all_images = [] #saves all imges of the video
         self.key_time = []  # saves the time of captions
         self.captions_save = [] # this will hold the captions in a viable format
         self.caption_str = "" #this will save the caption_str
@@ -67,44 +67,23 @@ class FrameExtractor():
             line_counter += 1
 
         self.key_time = sorted(set(self.key_time))
+
+    def _list_faces_neighbors(self, list_faces):
+        list_r = []
+        for faces in list_faces:
+            # print(faces)
+            if isinstance(faces, list)  and len(faces) > 1 and faces[1] != -1:
+                list_r += faces[1:]
+        return list_r
+    def _create_img(self, img, counter_img, img_ext='.jpg', create=True):
+        img_path = os.path.join(self.video_dir, ''.join([self.img_name, '_', str(counter_img), img_ext]))
+        print("image path: ", img_path)
+        cv2.imwrite(img_path, img)
+        self.all_images.append(img_path)
+        return img_path
     
 
-    def extract_frames_no_caption(self, img_ext = '.jpg'):
-        if not self.vid_cap.isOpened():
-            self.vid_cap = cv2.VideoCapture(self.video_path)
-        
-        if self.video_dir is None:
-            self.video_dir = os.getcwd()
-        else:
-            if not os.path.isdir(self.video_dir):
-                os.mkdir(self.video_dir)
-                print(f'Created the following directory: {self.video_dir}')
-                
-        
-        frame_cnt = 0
-        img_cnt = 0
-
-        while self.vid_cap.isOpened():
-            
-            success,image = self.vid_cap.read() 
-            
-            if not success:
-                break
-            
-            if frame_cnt % self.frames_frequency == 0:
-                img_path = os.path.join(self.video_dir, ''.join([self.img_name, '_', str(img_cnt), img_ext]))
-                
-                print("image path: ", img_path)
-                cv2.imwrite(img_path, image) 
-
-                self.time_frames[int((frame_cnt / self.fps))] = frame_struct(int((frame_cnt / self.fps)),img_path, show_prediction(img_path))  
-                img_cnt += 1
-                
-            frame_cnt += 1
-        
-        self.vid_cap.release()
-        cv2.destroyAllWindows()
-    def extract_frames_caption(self, img_ext='.jpg'):
+    def extract_frames_no_caption(self, img_ext='.jpg',prob_f=0.8,by_frame=False):
         if not self.vid_cap.isOpened():
             self.vid_cap = cv2.VideoCapture(self.video_path)
         
@@ -115,48 +94,259 @@ class FrameExtractor():
                 os.mkdir(self.video_dir)
                 print(f'Created the following directory: {self.video_dir}')
         
-        frame_cnt = 0
-        img_cnt = 0
         caption_counter = 0
-        last_time = -1
+        last_time_added = -1
+        # counts the number of frames
+        frame_cnt = 0
+        # counts the number of images saved
+        img_cnt = 0
+        # number of neighbor needed to verify the faces ( conts the current frame)
+        n_neighbors = 21
+        mid_value = int(n_neighbors/2)
+        
+        # this list is a list of lists, that holds path of a img and the faces related to the path of the img
+        # so all the list inside this list will be like this : [pathF, img_face_crop0 , img_face_crop1 , img_face_crop2, img_face_crop3 ...] 
+        list_faces = [-1 for i in range(n_neighbors)]
+
+        # this is a numpy list that holds number of frames that we will have to wait until we save the frame
+        list_idx_frames = np.array([]) 
+        counter_aux = 0
+
+        
+
 
         while self.vid_cap.isOpened():
             
+            # update the list_faces
+            cur_second = int((frame_cnt / self.fps))
             success,image = self.vid_cap.read() 
-            
+
             if not success:
                 break
 
-            # making a frame for each time of caption
-            if ( len(self.key_time) > caption_counter and int((frame_cnt / self.fps)) ==  self.key_time[caption_counter]) and (last_time != self.key_time[caption_counter]):
-                last_time = self.key_time[caption_counter]
-                img_path = os.path.join(self.video_dir, ''.join([self.img_name, '_', str(img_cnt), img_ext]))
+            # updates the first elemento of the list
+            list_faces = shift(list_faces,-1);
+            # makes a rotation right
+            # update a our list 
+            list_faces[0] = [[image, cur_second]]
+            
+            if (frame_cnt % self.frames_frequency == 0 and last_time_added != list_faces[0][0][1]):
+                list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
+
+            if (len(list_idx_frames) > 0):
+                # iterating over backwards to since we need to maintain the order of the frames
+                # sorted by descreasing time 
+                for i in range(len(list_faces) - 1, -1,-1):
+                    #saving each frame if was not saved
+                    # so the firs element of a list of a  list_faces, will be [image, cur sencond, ]
+                    # follow by some faces_images
+
+                    # checks if the element was already processed ( the img was writen )
+                    # if not writes the image 
+                    if isinstance(list_faces[i], list) and len(list_faces[i][0]) < 3:
+                        
+                        path_img = self._create_img(list_faces[i][0][0], img_cnt, img_ext)
+                        list_faces[i][0] +=  [path_img]
+
+                        img_cnt += 1
+                        
+                        # checking if was not processed (faces in te frames)
+                        # so list_faces[i] will be [[image, cur sencond, path]] if we din't check for faces in the past
+                        (list_aux1, _) = prop_of_having_face(list_faces[i][0][2],confidence_arg=prob_f,save_img=True)
+                        list_faces[i] += list_aux1
+                        
+                    
+                # update the list of frames
+                list_idx_frames -= 1
+
                 
-                print("image path: ", img_path)
-                cv2.imwrite(img_path, image)
 
-                self.time_frames[last_time] = frame_struct(last_time,img_path, show_prediction(img_path))
-
-                
-
-                img_cnt += 1
-                caption_counter += 1
-
-            elif frame_cnt % self.frames_frequency == 0:
-                img_path = os.path.join(self.video_dir, ''.join([self.img_name, '_', str(img_cnt), img_ext]))
-                
-                print("image path: ", img_path)
-                cv2.imwrite(img_path, image)  
-
-                self.time_frames[int((frame_cnt / self.fps))] = frame_struct(int((frame_cnt / self.fps)),img_path, show_prediction(img_path))
-                
-
-                img_cnt += 1
-
+                # checks if the value is possible to create 
+                if (list_idx_frames[0] == 0 ):
+                    if (counter_aux >= mid_value):
+                        self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
+                                                                                        list_faces[mid_value][0][2],
+                                                                                        self._list_faces_neighbors(list_faces))
+                    else :
+                        print(counter_aux)
+                        self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
+                                                                                        list_faces[counter_aux][0][2],
+                                                                                        self._list_faces_neighbors(list_faces))
+                    list_idx_frames = np.delete(list_idx_frames,0)
+                    
             frame_cnt += 1
-        
+            counter_aux += 1
         self.vid_cap.release()
         cv2.destroyAllWindows()
+      
+        while len(list_idx_frames) :
+        
+            shift(list_faces, -1)
+            
+            # iterating over backwards to since we need to maintain the order of the frames
+            # sorted by descreasing time 
+            for i in range(len(list_faces) - 1, -1,-1):
+                #saving each frame if was not saved
+                # so the firs element of a list of a  list_faces, will be [image, cur sencond, ]
+                # follow by some faces_images
+
+                # checks if the element was already processed (if the img was writen )
+                # if not writes the image and 
+                if isinstance(list_faces[i], list) and len(list_faces[i][0]) < 3:
+                    # writes the img and returns the path
+                    path_img = self._create_img(list_faces[i][0][0], img_cnt, img_ext)
+                    list_faces[i][0] +=  [path_img]
+
+                    img_cnt += 1
+                    
+                    # checking if was not processed (faces in te frames)
+                    # so list_faces[i] will be [[image, cur sencond, path]], now we add the faces path 
+                    (list_aux1, _) = prop_of_having_face(list_faces[i][0][2],confidence_arg=prob_f,save_img=True)
+                    list_faces[i] += list_aux1
+
+            
+            
+            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces))
+            list_idx_frames = np.delete(list_idx_frames,0)
+            list_idx_frames -= 1
+
+    def extract_frames_caption(self, img_ext='.jpg',prob_f=0.8,by_frame=False):
+        if not self.vid_cap.isOpened():
+            self.vid_cap = cv2.VideoCapture(self.video_path)
+        
+        if self.video_dir is None:
+            self.video_dir = os.getcwd()
+        else:
+            if not os.path.isdir(self.video_dir):
+                os.mkdir(self.video_dir)
+                print(f'Created the following directory: {self.video_dir}')
+        
+        caption_counter = 0
+        last_time_added = -1
+        # counts the number of frames
+        frame_cnt = 0
+        # counts the number of images saved
+        img_cnt = 0
+        # number of neighbor needed to verify the faces ( conts the current frame)
+        n_neighbors = 21
+        mid_value = int(n_neighbors/2)
+        
+        # this list is a list of lists, that holds path of a img and the faces related to the path of the img
+        # so all the list inside this list will be like this : [pathF, img_face_crop0 , img_face_crop1 , img_face_crop2, img_face_crop3 ...] 
+        list_faces = [-1 for i in range(n_neighbors)]
+
+        # this is a numpy list that holds number of frames that we will have to wait until we save the frame
+        list_idx_frames = np.array([]) 
+        counter_aux = 0
+        bool_possible_key = False
+        
+
+
+        while self.vid_cap.isOpened():
+            
+            # update the list_faces
+            cur_second = int((frame_cnt / self.fps))
+            success,image = self.vid_cap.read() 
+
+            if not success:
+                break
+
+            # updates the first elemento of the list
+            list_faces = shift(list_faces,-1);
+            # makes a rotation right
+            # update a our list 
+            list_faces[0] = [[image, cur_second]]
+
+            
+            
+            
+            
+            bool_possible_key = (len(self.key_time) > caption_counter and
+                                cur_second ==  self.key_time[caption_counter])
+            # checking if the current time is alsi a key time
+            if (bool_possible_key ):
+                last_time_added = list_faces[0][0][1]
+                list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
+                caption_counter += 1
+            elif (frame_cnt % self.frames_frequency == 0 and last_time_added != list_faces[0][0][1]):
+                list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
+
+            if (len(list_idx_frames) > 0):
+                # iterating over backwards to since we need to maintain the order of the frames
+                # sorted by descreasing time 
+                for i in range(len(list_faces) - 1, -1,-1):
+                    #saving each frame if was not saved
+                    # so the firs element of a list of a  list_faces, will be [image, cur sencond, ]
+                    # follow by some faces_images
+
+                    # checks if the element was already processed ( the img was writen )
+                    # if not writes the image 
+                    if isinstance(list_faces[i], list) and len(list_faces[i][0]) < 3:
+                        
+                        path_img = self._create_img(list_faces[i][0][0], img_cnt, img_ext)
+                        list_faces[i][0] +=  [path_img]
+
+                        img_cnt += 1
+                        
+                        # checking if was not processed (faces in te frames)
+                        # so list_faces[i] will be [[image, cur sencond, path]] if we din't check for faces in the past
+                        (list_aux1, _) = prop_of_having_face(list_faces[i][0][2],confidence_arg=prob_f,save_img=True)
+                        list_faces[i] += list_aux1
+                        
+                    
+                # update the list of frames
+                list_idx_frames -= 1
+
+                
+
+                # checks if the value is possible to create 
+                if (list_idx_frames[0] == 0 ):
+                    if (counter_aux >= mid_value):
+                        self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
+                                                                                        list_faces[mid_value][0][2],
+                                                                                        self._list_faces_neighbors(list_faces))
+                    else :
+                        print(counter_aux)
+                        self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
+                                                                                        list_faces[counter_aux][0][2],
+                                                                                        self._list_faces_neighbors(list_faces))
+                    list_idx_frames = np.delete(list_idx_frames,0)
+                    
+            frame_cnt += 1
+            counter_aux += 1
+        self.vid_cap.release()
+        cv2.destroyAllWindows()
+      
+        while len(list_idx_frames) :
+        
+            shift(list_faces, -1);
+            
+            # iterating over backwards to since we need to maintain the order of the frames
+            # sorted by descreasing time 
+            for i in range(len(list_faces) - 1, -1,-1):
+                #saving each frame if was not saved
+                # so the firs element of a list of a  list_faces, will be [image, cur sencond, ]
+                # follow by some faces_images
+
+                # checks if the element was already processed (if the img was writen )
+                # if not writes the image and 
+                if isinstance(list_faces[i], list) and len(list_faces[i][0]) < 3:
+                    # writes the img and returns the path
+                    path_img = self._create_img(list_faces[i][0][0], img_cnt, img_ext)
+                    list_faces[i][0] +=  [path_img]
+
+                    img_cnt += 1
+                    
+                    # checking if was not processed (faces in te frames)
+                    # so list_faces[i] will be [[image, cur sencond, path]], now we add the faces path 
+                    (list_aux1, _) = prop_of_having_face(list_faces[i][0][2],confidence_arg=prob_f,save_img=True)
+                    list_faces[i] += list_aux1
+
+            
+            
+            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces))
+            list_idx_frames = np.delete(list_idx_frames,0)
+            list_idx_frames -= 1
 
     def correlates_caption_frame(self):
       for cap in self.captions_save:
@@ -217,18 +407,27 @@ class FrameExtractor():
     def normalize_sentiment(self):
         if self.has_caption:
             max_value_caption_ktrain = max([abs(cap.feeling) for cap in self.captions_save])
+            if(max_value_caption_ktrain == 0):
+                max_value_caption_ktrain=1
             for i in range(len(self.captions_save)):
                 self.captions_save[i].feeling = self.captions_save[i].feeling / max_value_caption_ktrain
-        
+
         max_value_frame_ktrain = max([abs(self.time_frames[min_f].feeling_ktrain) for min_f in self.time_frames])
+        if (max_value_frame_ktrain == 0):
+            max_value_frame_ktrain=1
         max_value_frame_description = abs(max([abs(self.time_frames[timing].feeling) for timing in self.time_frames]))
+        if (max_value_frame_description == 0):
+            max_value_frame_description=1
+
+        max_value_frame_ktrain_avg = abs(max([abs(self.time_frames[timing].feeling_ktrain_avg) for timing in self.time_frames]))
+        if (max_value_frame_ktrain_avg == 0):
+            max_value_frame_ktrain_avg=1
 
         for min_f in self.time_frames:
-            self.time_frames[min_f].feeling_ktrain = self.time_frames[min_f].feeling_ktrain / max_value_frame_ktrain 
+            self.time_frames[min_f].feeling_ktrain = self.time_frames[min_f].feeling_ktrain / max_value_frame_ktrain
+            self.time_frames[min_f].feeling = self.time_frames[min_f].feeling / max_value_frame_description
+            self.time_frames[min_f].feeling_ktrain_avg = self.time_frames[min_f].feeling_ktrain_avg / max_value_frame_ktrain_avg
 
-        for timing in self.time_frames:
-            self.time_frames[timing].feeling = self.time_frames[timing].feeling / max_value_frame_description
-        
 
           
 
@@ -272,6 +471,61 @@ class FrameExtractor():
           print("positivity : ", sigmoid(self.time_frames[time_of_frame].feeling))
           print("\n############################################\n")
           numberFrame += 1
+
+    def sum_the_positivity_of_vid_consent(self):
+      xC = []
+      xF = []
+      yC = []
+      yF = []
+      yFD = []
+      yT = []
+
+
+      last = 0.0
+      lastD = 0.0
+
+      start_min_caption = 0
+      end_max_caption = 0
+      start_min_frame = list(self.time_frames.keys())[0]
+      end_max_frame = list(self.time_frames.keys())[-1]
+
+      if self.has_caption:
+        # since the list is order by the start time I can ensure that the min start will be the first 
+        start_min_caption = self.captions_save[0].start
+        # but I can't say the same for the max end
+        end_max_caption = max([cap.end for cap in self.captions_save])
+
+        start_min = min(start_min_caption, start_min_frame)
+        min_aux = start_min
+        end_max = max(end_max_caption, end_max_frame)
+
+        while start_min <= end_max:
+          xC.append(start_min)
+          yC.append( average( self.get_intervale_sentiment_caption(start_min)))
+          if start_min in self.time_frames:
+            lastD = self.time_frames[start_min].feeling
+            last = self.time_frames[start_min].feeling_ktrain
+          xF.append(start_min)
+          yF.append(last)
+          yFD.append(lastD)
+          start_min += 1
+          # defines the porcentage of the caption/ frame 
+          yT.append( consent_values( [yC[-1], yF[-1], yFD[-1]] ) )  
+
+      else: 
+        last = 0.0
+        while start_min_frame <= end_max_frame:
+          if start_min_frame in self.time_frames:
+            lastD = self.time_frames[start_min_frame].feeling
+            last = self.time_frames[start_min_frame].feeling_ktrain
+          xF.append(start_min_frame)
+          yF.append(last)
+          yFD.append(lastD) 
+          yT.append( consent_values( [yF[-1], yFD[-1]] ) )
+          start_min_frame += 1
+      
+      return sum(yT)
+
     def sum_the_positivity_of_vid(self, weightc=0.6, weightf=0.2, apart=False):
       weightfd= 1 - (weightc + weightf)
       
@@ -353,7 +607,7 @@ class FrameExtractor():
     # and plots, for example I'm using the average function, which takes a list and return a the average of the list
     # pCap the part of the caption that we will considere
     # pFrame the part of the frame that we will considere
-    def create_time_siries(self, weightc=0.6, weightf=0.2):
+    def create_time_siries(self, weightc=0.6, weightf=0.2, consent_F=True ,consent=True):
       weightfd = 1 - weightf
       if (self.has_caption):
           weightfd = 1 - ( weightc + weightf )
@@ -365,11 +619,15 @@ class FrameExtractor():
       xF = []
       yF = []
       yFD = []
+      yFIMDB = []
+      yFBert = []
       yT = []
 
 
       last = 0.0
       lastD = 0.0
+      lastFIMDB = 0.0
+      lastFBert = 0.0
 
       start_min_caption = 0
       end_max_caption = 0
@@ -390,18 +648,34 @@ class FrameExtractor():
           xC.append(start_min)
           yC.append( average( self.get_intervale_sentiment_caption(start_min)))
           if start_min in self.time_frames:
-                lastD = self.time_frames[start_min].feeling
+            lastD = self.time_frames[start_min].feeling
+            lastFIMDB = self.time_frames[start_min].feeling_ktrain_text
+            lastFBert = self.time_frames[start_min].feeling_bert
+            if (consent_F):
                 last = self.time_frames[start_min].feeling_ktrain
+            else :
+                last = self.time_frames[start_min].feeling_ktrain_avg
           xF.append(start_min)
           yF.append(last)
           yFD.append(lastD)
+          yFIMDB.append(lastFIMDB)
+          yFBert.append(lastFBert)
           start_min += 1
           # defines the porcentage of the caption/ frame 
-          yT.append((yC[-1] * weightc ) + (yF[-1] * weightf) + (yFD[-1] * weightfd) )
+          if (consent):
+            yT.append( consent_values( [yC[-1], yF[-1], yFD[-1]] ) )
+          else:
+            yT.append((yC[-1] * weightc ) + (yF[-1] * weightf) + (yFD[-1] * weightfd) )
         plt.plot(xC, yC, label="caption")
         plt.plot(xF, yF, label="frame")
         plt.plot(xF, yFD, label="frame d")
-        plt.plot(xC, yT, label=  str(weightc * 100) + " cap " + str(weightf * 100)  + " frame" + str(weightfd * 100)  + " frame d")
+        plt.plot(xF, yFIMDB, label="frame IMDB")
+        plt.plot(xF, yFBert, label="frame Bert")
+
+        if (consent):
+          plt.plot(xC, yT, label=  "consent between the caption feeling, frame descriptio and the face analysis ")
+        else:
+          plt.plot(xC, yT, label=  str(weightc * 100) + " cap " + str(weightf * 100)  + " frame" + str(weightfd * 100)  + " frame d")
         
         plt.xticks(np.arange(min_aux, end_max + 1, 10.0))      
 
@@ -409,17 +683,31 @@ class FrameExtractor():
         last = 0.0
         while start_min_frame <= end_max_frame:
           if start_min_frame in self.time_frames:
-            lastD = self.time_frames[start_min].feeling
-            last = self.time_frames[start_min].feeling_ktrain
+            lastD = self.time_frames[start_min_frame].feeling
+            lastFIMDB = self.time_frames[start_min_frame].feeling_ktrain_text
+            lastFBert = self.time_frames[start_min_frame].feeling_bert
+            if (consent_F):
+                last = self.time_frames[start_min_frame].feeling_ktrain
+            else :
+                last = self.time_frames[start_min_frame].feeling_ktrain_avg
           xF.append(start_min_frame)
           yF.append(last)
           yFD.append(lastD)
-          yT.append( (yF[-1] * weightf) + (yFD[-1] * weightfd) )
+          yFIMDB.append(lastFIMDB)
+          yFBert.append(lastFBert)
+
+          if (consent):
+            yT.append( consent_values( [yF[-1], yFD[-1]] ) )
+          else:
+            yT.append( (yF[-1] * weightf) + (yFD[-1] * weightfd) )
           
           start_min_frame += 1
         
         plt.plot(xF, yF, label="frame")
         plt.plot(xF, yFD, label="frame d")
+        plt.plot(xF, yFIMDB, label="frame IMDB")
+        plt.plot(xF, yFBert, label="frame Bert")
+
         plt.plot(xF, yT, label=  str(weightf * 100)  + " frame" + str(weightfd * 100)  + " frame d")
 
 
@@ -443,7 +731,7 @@ class FrameExtractor():
         aux_value += 0.5
       plt.plot(x, y, label="caption" + str(counter))
 
-    def plot_caption_sentiment_during_time(self, bool_frame=True):
+    def plot_caption_sentiment_during_time(self, consent_F=True,bool_frame=True):
       counter = 0
       rc('figure', figsize=(20, 10))
       
@@ -459,7 +747,10 @@ class FrameExtractor():
       if bool_frame:
         for timing in self.time_frames:
           x.append(timing)
-          yF.append(self.time_frames[timing].feeling_ktrain)
+          if consent_F:
+            yF.append(self.time_frames[timing].feeling_ktrain)
+          else:
+            yF.append(self.time_frames[timing].feeling_ktrain_avg)
           yD.append(self.time_frames[timing].feeling)
 
         plt.plot(x, yF, 'rs',label="frame")
@@ -471,20 +762,19 @@ class FrameExtractor():
         plt.show()
 
 # does every preparation step before
-def do_preparation(id, lang='en', frames_t = 200):
-  if not os.path.isdir("/content/vqa-maskrcnn-benchmark/dataset/"):
-            os.mkdir("/content/vqa-maskrcnn-benchmark/dataset/")
-            print(f'Created the following directory: /content/vqa-maskrcnn-benchmark/dataset/')
-
-  load_models();
-
-  ulr_to_download = 'https://www.youtube.com/watch?v=' + id
+def do_preparation(id, lang='en', frames_t=200):
+  if frames_t < 2:
+    print("\033[93merror, frame rate is less than minimum (2)\x1b[0m")
+    return []
   
-
+  ulr_to_download = 'https://www.youtube.com/watch?v=' + id
+  #   itag = 18
   print("downloading the video from the ulr : ", ulr_to_download)
   video = YouTube(ulr_to_download)
 
-  # chosing the stream of highest resolution that is mp4 
+  
+  
+
   max_res = 0
   itag_max = -1
   for stream in video.streams.all():
@@ -492,20 +782,20 @@ def do_preparation(id, lang='en', frames_t = 200):
           max_res = (int)(stream.resolution[:-1])
           itag_max = stream.itag 
   video.streams.get_by_itag(str(itag_max)).download()
+  
 
 
 
+  extractor_obj = FrameExtractor(video.title,id, video_length=video.length,frames_frequency=frames_t)
 
-  extractor_obj = FrameExtractor(video.title,id,video_length=video.length ,frames_frequency=frames_t)
-  has_caption = False
+
   for cap in video.captions.all():
 
     if cap.code == lang:
-      has_caption = True
       extractor_obj.has_caption = True
 
   extractor_obj.just_extract(video,lang)
-  extractor_obj.normalize_sentiment();
+  extractor_obj.normalize_sentiment()
 
 
   # removing the movie
@@ -514,4 +804,4 @@ def do_preparation(id, lang='en', frames_t = 200):
   # enviando os dados e tornando-os visíveis no drive
 
 
-  return extractor_obj   
+  return extractor_obj  

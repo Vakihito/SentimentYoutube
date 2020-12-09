@@ -76,7 +76,7 @@ wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download
 unzip trained_models.zip
 
 pip3 install yacs
-pip3 install git+https://github.com/Vakihito/pytube.git
+pip3 install git+https://github.com/nficano/pytube
 pip3 install git+https://github.com/Vakihito/ktrain.git
 pip3 install git+https://github.com/amaiya/eli5@tfkeras_0_10_1
 pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
@@ -84,6 +84,11 @@ pip3 install git+https://github.com/amaiya/stellargraph@no_tf_dep_082
 wget https://github.com/gopinath-balu/computer_vision/raw/master/CAFFE_DNN/res10_300x300_ssd_iter_140000.caffemodel
 wget https://raw.githubusercontent.com/gopinath-balu/computer_vision/master/CAFFE_DNN/deploy.prototxt.txt
 #open the correct dir to use
-cd /content/vqa-maskrcnn-benchmark
+pip3 install git+https://github.com/rmarcacini/sentence-transformers
+pip3 install gdown
+gdown https://drive.google.com/uc?id=1NV5t1YhyyOzMF5zAovfbSLdZZLvqrfZ_
+unzip distiluse-base-multilingual-cased.zip -d language_model
 
-
+gdown --id 1rzOmkZHWMpNLyA4XitU_i1sCN-NVLU52
+unzip bert_lex_model-20201124T204602Z-001.zip
+gdown --id 1eEHQ0NMJldPzvh9crE6C-3wV4DA1hIE5
