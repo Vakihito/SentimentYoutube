@@ -16,7 +16,6 @@ from .PythiaDemo import PythiaDemo
 from google.colab.patches import cv2_imshow
 from .BertLex import load_bert
 from .BertLex import get_bert_lex
-from .BertLex import return_bert_lex
 
 model_load = False
 
