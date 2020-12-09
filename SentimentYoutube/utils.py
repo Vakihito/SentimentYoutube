@@ -45,7 +45,6 @@ def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_
     print("Loading model lexical Bert model...")
     load_bert('/content')
 
-    return return_bert_lex()
 
 def consent_values(sentiment_list):
     lista_sent = sentiment_list
