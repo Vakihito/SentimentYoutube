@@ -778,7 +778,7 @@ class FrameExtractor():
 
 
 # does every preparation step before
-def do_preparation(id, using_bert=True ,lang='en', frames_t=200):
+def do_preparation(id ,lang='en', frames_t=200):
   if frames_t < 2:
     print("\033[93merror, frame rate is less than minimum (2)\x1b[0m")
     return []
@@ -799,7 +799,7 @@ def do_preparation(id, using_bert=True ,lang='en', frames_t=200):
           itag_max = stream.itag 
   video.streams.get_by_itag(str(itag_max)).download()
 
-  extractor_obj = FrameExtractor(video.title,id, use_bert=using_bert,video_length=video.length,frames_frequency=frames_t)
+  extractor_obj = FrameExtractor(video.title,id, use_bert=is_using_bert(),video_length=video.length,frames_frequency=frames_t)
 
   for cap in video.captions.all():
 

@@ -18,15 +18,20 @@ from .BertLex import load_bert
 from .BertLex import get_bert_lex
 
 model_load = False
-
+use_bert = False
   
 
-def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_text', net_model_dir="/content/res10_300x300_ssd_iter_140000.caffemodel",net_prototx_dir="/content/deploy.prototxt.txt"):
+def is_using_bert():
+    return use_bert
+
+def load_models(using_bert=True ,face_dir='/content/sentiment_face',text_dir='/content/sentiment_text', net_model_dir="/content/res10_300x300_ssd_iter_140000.caffemodel",net_prototx_dir="/content/deploy.prototxt.txt"):
   global model_load
   if (not model_load):
-
-    print("Loading model lexical Bert model...")
-    load_bert('/content')
+    use_bert = using_bert
+    if use_bert:
+        print("Loading model lexical Bert model...")
+        load_bert('/content')
+    
     
     print("Loading pythia, this may take a while ...\n\n")
     global demo
