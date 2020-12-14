@@ -20,13 +20,15 @@ class FrameExtractor():
     '''
     Class used for extracting frames from a video file.
     '''
-    def __init__(self, video_name, video_id,video_length ,video_path="/content/vqa-maskrcnn-benchmark/", video_dir="/content/vqa-maskrcnn-benchmark/dataset/", frames_frequency=200):
+    def __init__(self, video_name, video_id,video_length, use_bert=False ,video_path="/content/vqa-maskrcnn-benchmark/", video_dir="/content/vqa-maskrcnn-benchmark/dataset/", frames_frequency=200):
         self.video_name = safe_filename(video_name)
         self.video_id = video_id
         self.video_path = video_path + self.video_name + ".mp4"
         self.video_dir = video_dir + self.video_name  + self.video_id + "_dir"
         self.video_len = video_length
         self.img_name = self.video_name + "_img"
+
+        self.use_bert = use_bert
 
         self.frames_frequency = frames_frequency
         self.vid_cap = cv2.VideoCapture(self.video_path)
@@ -166,12 +168,14 @@ class FrameExtractor():
                     if (counter_aux >= mid_value):
                         self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
                                                                                         list_faces[mid_value][0][2],
-                                                                                        self._list_faces_neighbors(list_faces))
+                                                                                        self._list_faces_neighbors(list_faces),
+                                                                                        use_bert=self.use_bert)
                     else :
                         print(counter_aux)
                         self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
                                                                                         list_faces[counter_aux][0][2],
-                                                                                        self._list_faces_neighbors(list_faces))
+                                                                                        self._list_faces_neighbors(list_faces),
+                                                                                        use_bert=self.use_bert)
                     list_idx_frames = np.delete(list_idx_frames,0)
                     
             frame_cnt += 1
@@ -304,12 +308,14 @@ class FrameExtractor():
                     if (counter_aux >= mid_value):
                         self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
                                                                                         list_faces[mid_value][0][2],
-                                                                                        self._list_faces_neighbors(list_faces))
+                                                                                        self._list_faces_neighbors(list_faces),
+                                                                                        use_bert=self.use_bert)
                     else :
                         print(counter_aux)
                         self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
                                                                                         list_faces[counter_aux][0][2],
-                                                                                        self._list_faces_neighbors(list_faces))
+                                                                                        self._list_faces_neighbors(list_faces),
+                                                                                        use_bert=self.use_bert)
                     list_idx_frames = np.delete(list_idx_frames,0)
                     
             frame_cnt += 1
@@ -650,7 +656,8 @@ class FrameExtractor():
           if start_min in self.time_frames:
             lastD = self.time_frames[start_min].feeling
             lastFIMDB = self.time_frames[start_min].feeling_ktrain_text
-            lastFBert = self.time_frames[start_min].feeling_bert
+            if self.use_bert:
+                lastFBert = self.time_frames[start_min].feeling_bert
             if (consent_F):
                 last = self.time_frames[start_min].feeling_ktrain
             else :
@@ -659,7 +666,10 @@ class FrameExtractor():
           yF.append(last)
           yFD.append(lastD)
           yFIMDB.append(lastFIMDB)
-          yFBert.append(lastFBert)
+          
+          if self.use_bert:
+            yFBert.append(lastFBert)
+          
           start_min += 1
           # defines the porcentage of the caption/ frame 
           if (consent):
@@ -670,7 +680,9 @@ class FrameExtractor():
         plt.plot(xF, yF, label="frame")
         plt.plot(xF, yFD, label="frame d")
         plt.plot(xF, yFIMDB, label="frame IMDB")
-        plt.plot(xF, yFBert, label="frame Bert")
+        
+        if self.use_bert:
+            plt.plot(xF, yFBert, label="frame Bert")
 
         if (consent):
           plt.plot(xC, yT, label=  "consent between the caption feeling, frame descriptio and the face analysis ")
@@ -685,7 +697,8 @@ class FrameExtractor():
           if start_min_frame in self.time_frames:
             lastD = self.time_frames[start_min_frame].feeling
             lastFIMDB = self.time_frames[start_min_frame].feeling_ktrain_text
-            lastFBert = self.time_frames[start_min_frame].feeling_bert
+            if self.use_bert:
+                lastFBert = self.time_frames[start_min_frame].feeling_bert
             if (consent_F):
                 last = self.time_frames[start_min_frame].feeling_ktrain
             else :
@@ -694,7 +707,8 @@ class FrameExtractor():
           yF.append(last)
           yFD.append(lastD)
           yFIMDB.append(lastFIMDB)
-          yFBert.append(lastFBert)
+          if self.use_bert:
+            yFBert.append(lastFBert)
 
           if (consent):
             yT.append( consent_values( [yF[-1], yFD[-1]] ) )
@@ -706,7 +720,8 @@ class FrameExtractor():
         plt.plot(xF, yF, label="frame")
         plt.plot(xF, yFD, label="frame d")
         plt.plot(xF, yFIMDB, label="frame IMDB")
-        plt.plot(xF, yFBert, label="frame Bert")
+        if self.use_bert:
+            plt.plot(xF, yFBert, label="frame Bert")
 
         plt.plot(xF, yT, label=  str(weightf * 100)  + " frame" + str(weightfd * 100)  + " frame d")
 

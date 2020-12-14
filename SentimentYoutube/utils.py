@@ -231,19 +231,19 @@ def show_image_url(ulr):
 ## this functions should not be used for now ##
 
 
-# def explain_frame(path, crop_faces=True):
-#     show_image(path)
-#     if (crop_faces):
-#         (faces, _) = prop_of_having_face(path,save_img=True,show_img=True)
-#     for face in faces:
-#         plt.imshow( predictor_face.explain(face))
-#         plt.show()
-#         print("The feeling on this face is :", predictor_face.predict_filename(face)[0])
-#     frame_des = show_prediction(path)
-#     return predictor_text.explain(frame_des)
+def explain_frame(path, crop_faces=True):
+    show_image(path)
+    if (crop_faces):
+        (faces, _) = prop_of_having_face(path,save_img=True,show_img=True)
+    for face in faces:
+        plt.imshow( predictor_face.explain(face))
+        plt.show()
+        print("The feeling on this face is :", predictor_face.predict_filename(face)[0])
+    frame_des = show_prediction(path)
+    return predictor_text.explain(frame_des)
 
-## this functions should not be used for now ##
+# this functions should not be used for now ##
 
 
-# def explain_text(text):
-#     return predictor_text.explain(text)
+def explain_text(text):
+    return predictor_text.explain(text)

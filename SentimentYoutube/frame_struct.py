@@ -10,17 +10,24 @@ class frame_struct():
       description (str),
       felling (textBlob.sentiment),
     '''
-    def __init__(self, timeF,  pathF, faces_P,neutral_range=0.05):
+    def __init__(self, timeF,  pathF, faces_P, use_bert=True,neutral_range=0.05):
       # neutral_range - defines the range in wich the feeling on the frame description will be classified as neutral
       self.time = timeF
       self.path = pathF
       self.description = show_prediction(pathF)
  
+      self.use_bert = use_bert
+
+
       self.feeling_ktrain_text = predict_text(self.description,method="IMDB",neutral_range=neutral_range) 
-      (aux_nearst_query, self.feeling_bert) = predict_text(self.description,method="Bert",only_sentiment=False,neutral_range=neutral_range) 
-      self.feeling = (self.feeling_ktrain_text + self.feeling_bert)/2
-      self.nearst_query = aux_nearst_query.loc[0] 
-      
+
+      if use_bert:
+        (aux_nearst_query, self.feeling_bert) = predict_text(self.description,method="Bert",only_sentiment=False,neutral_range=neutral_range) 
+        self.feeling = (self.feeling_ktrain_text + self.feeling_bert)/2
+        self.nearst_query = aux_nearst_query.loc[0]
+      else:
+        self.feeling = self.feeling_ktrain_text
+        
       self.feeling_ktrain = 0
       self.feeling_ktrain_avg = 0
       self.faces = faces_P
@@ -53,15 +60,19 @@ class frame_struct():
         self.show_img()
       print("description : ", self.description)
       print("Feeling AVG :", self.feeling)
-      print("Feeling text ktrain : ", self.feeling_ktrain_text)
-      print("Feeling text bert : ", self.feeling_bert)
-      print("Nearst query lang : ", self.nearst_query["lang"])
-      print("Nearst query string : ", self.nearst_query["word"])
-      print("Nearst query value : ", self.nearst_query["query"])
+      
+      if self.use_bert:
+        print("Feeling text ktrain : ", self.feeling_ktrain_text)
+        print("Feeling text bert : ", self.feeling_bert)
+        print("Nearst query lang : ", self.nearst_query["lang"])
+        print("Nearst query string : ", self.nearst_query["word"])
+        print("Nearst query value : ", self.nearst_query["query"])
+
       if (show_c):
           for i in self.faces:
               print(i)
               show_image(i)
+              
       print("Number_of_faces analised : ", self.n_faces)
       print("Feeling in faces analasys: ", self.feeling_ktrain)
       print("Average feeling in faces analasys: ", self.feeling_ktrain_avg)
