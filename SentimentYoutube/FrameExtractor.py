@@ -776,8 +776,9 @@ class FrameExtractor():
         plt.title('time x feelling')
         plt.show()
 
+
 # does every preparation step before
-def do_preparation(id, lang='en', frames_t=200):
+def do_preparation(id, using_bert=True ,lang='en', frames_t=200):
   if frames_t < 2:
     print("\033[93merror, frame rate is less than minimum (2)\x1b[0m")
     return []
@@ -797,12 +798,8 @@ def do_preparation(id, lang='en', frames_t=200):
           max_res = (int)(stream.resolution[:-1])
           itag_max = stream.itag 
   video.streams.get_by_itag(str(itag_max)).download()
-  
 
-
-
-  extractor_obj = FrameExtractor(video.title,id, video_length=video.length,frames_frequency=frames_t)
-
+  extractor_obj = FrameExtractor(video.title,id, use_bert=using_bert,video_length=video.length,frames_frequency=frames_t)
 
   for cap in video.captions.all():
 
@@ -810,7 +807,7 @@ def do_preparation(id, lang='en', frames_t=200):
       extractor_obj.has_caption = True
 
   extractor_obj.just_extract(video,lang)
-  extractor_obj.normalize_sentiment()
+  extractor_obj.normalize_sentiment();
 
 
   # removing the movie
@@ -819,4 +816,4 @@ def do_preparation(id, lang='en', frames_t=200):
   # enviando os dados e tornando-os visíveis no drive
 
 
-  return extractor_obj  
+  return extractor_obj      
