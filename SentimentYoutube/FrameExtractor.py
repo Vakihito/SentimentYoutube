@@ -63,7 +63,7 @@ class FrameExtractor():
             # comment type
             if (line_counter + 1) % 4  == 0 and self.video_len >= time_e:  
                 string_cap = line
-                self.captions_save.append(caption_struct(time_s, time_e, string_cap))
+                self.captions_save.append(caption_struct(time_s, time_e, string_cap, use_bert=self.use_bert))
                 self.key_time.append(time_s)
                 self.key_time.append(time_e)
             line_counter += 1
@@ -210,7 +210,7 @@ class FrameExtractor():
 
             
             
-            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces))
+            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces), use_bert=self.use_bert)
             list_idx_frames = np.delete(list_idx_frames,0)
             list_idx_frames -= 1
 
@@ -350,7 +350,7 @@ class FrameExtractor():
 
             
             
-            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces))
+            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces), use_bert=self.use_bert)
             list_idx_frames = np.delete(list_idx_frames,0)
             list_idx_frames -= 1
 
