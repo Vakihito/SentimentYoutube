@@ -22,10 +22,11 @@ use_bert = False
   
 
 def is_using_bert():
+    global use_bert
     return use_bert
 
 def load_models(using_bert=True ,face_dir='/content/sentiment_face',text_dir='/content/sentiment_text', net_model_dir="/content/res10_300x300_ssd_iter_140000.caffemodel",net_prototx_dir="/content/deploy.prototxt.txt"):
-  global model_load
+  global model_load, use_bert
   if (not model_load):
     use_bert = using_bert
     if use_bert:
