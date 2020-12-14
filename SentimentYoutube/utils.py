@@ -24,6 +24,10 @@ model_load = False
 def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_text', net_model_dir="/content/res10_300x300_ssd_iter_140000.caffemodel",net_prototx_dir="/content/deploy.prototxt.txt"):
   global model_load
   if (not model_load):
+
+    print("Loading model lexical Bert model...")
+    load_bert('/content')
+    
     print("Loading pythia, this may take a while ...\n\n")
     global demo
     demo = PythiaDemo()
@@ -42,9 +46,7 @@ def load_models(face_dir='/content/sentiment_face',text_dir='/content/sentiment_
     global net
     net = cv2.dnn.readNetFromCaffe(net_prototx_dir, net_model_dir)
 
-    print("Loading model lexical Bert model...")
-    load_bert('/content')
-
+    
 
 def consent_values(sentiment_list):
     lista_sent = sentiment_list
