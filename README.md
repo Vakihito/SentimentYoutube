@@ -38,19 +38,22 @@ This library uses Ktrain in order to train models and load models, and also uses
         - **show_image_url** - Shows a image given a url
         - **show_image** - Shows a image given a path
         - **show_prediction** - Shows pythia predicion of a image given by either a path or an url
+        - **explain_frame** - Explain the classification of the image ( this function doesn't works with BERT, so see the example on how to use explain)
+        - **explain_text** - Explain the classification of a text ( this function doesn't works with BERT, so see the example on how to use explain)
 
 ---
 
 ### Tutorials
 Please see the following tutorial notebooks for a guide on how to use **SentimentYoutube** on your projects:
     
-- **Tutorial 1**: [Introduction](https://colab.research.google.com/drive/1EWV1Qss2IxqUReJe1GO4N0AyUviZGCeZ?authuser=1)
+- **Tutorial 1**: [Introduction](https://colab.research.google.com/drive/1JEmHlvQ2CFP6Zwdoi1TQyu_Fjzb7J2kW?usp=sharing)
 
 ---
 ### Examples
 Please see the following examples notebooks for a guide on how to use **SentimentYoutube** on your projects:
     
-- **How to use** : [Introduction](https://colab.research.google.com/drive/1EWV1Qss2IxqUReJe1GO4N0AyUviZGCeZ?authuser=1)
+- **How to use** : [Introduction](https://colab.research.google.com/drive/1JEmHlvQ2CFP6Zwdoi1TQyu_Fjzb7J2kW?usp=sharing)
+- **Using Explain** : [Explain Notebook](https://colab.research.google.com/drive/1EWV1Qss2IxqUReJe1GO4N0AyUviZGCeZ?usp=sharing)
 
 ---
 
