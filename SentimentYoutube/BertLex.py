@@ -45,7 +45,7 @@ def load_bert(DirPath):
 
 def get_bert_lex(text,lang='all',k=3, max_query=1.5):
   
-  global df_lex
+  global df_lex, language_model
 
 
   features = np.array([list(language_model.encode([text],show_progress_bar=False)[0])])
