@@ -110,7 +110,6 @@ class FrameExtractor():
                 os.mkdir(self.video_dir)
                 print(f'Created the following directory: {self.video_dir}')
         
-        caption_counter = 0
         last_time_added = -1
         # counts the number of frames
         frame_cnt = 0
@@ -186,13 +185,15 @@ class FrameExtractor():
                             self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
                                                                                             list_faces[mid_value][0][2],
                                                                                             self._list_faces_neighbors(list_faces),
-                                                                                            use_bert=self.use_bert)
+                                                                                            use_bert=self.use_bert,
+                                                                                            use_ktrain=self.use_ktrain)
                         else :
                             print(counter_aux)
                             self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
                                                                                             list_faces[counter_aux][0][2],
                                                                                             self._list_faces_neighbors(list_faces),
-                                                                                            use_bert=self.use_bert)
+                                                                                            use_bert=self.use_bert,
+                                                                                            use_ktrain=self.use_ktrain)
                         list_idx_frames = np.delete(list_idx_frames,0)
                         
                 counter_aux += 1
@@ -227,7 +228,7 @@ class FrameExtractor():
 
             
             
-            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces), use_bert=self.use_bert)
+            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces), use_bert=self.use_bert, use_ktrain=self.use_ktrain)
             list_idx_frames = np.delete(list_idx_frames,0)
             list_idx_frames -= 1
 
@@ -247,6 +248,9 @@ class FrameExtractor():
                 print(f'Created the following directory: {self.video_dir}')
         
         caption_counter = 0
+        while (self.start_time > self.captions_save[caption_counter].start):
+            caption_counter += 1  
+        
         last_time_added = -1
         # counts the number of frames
         frame_cnt = 0
@@ -331,13 +335,15 @@ class FrameExtractor():
                             self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
                                                                                             list_faces[mid_value][0][2],
                                                                                             self._list_faces_neighbors(list_faces),
-                                                                                            use_bert=self.use_bert)
+                                                                                            use_bert=self.use_bert,
+                                                                                            use_ktrain=self.use_ktrain)
                         else :
                             print(counter_aux)
                             self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
                                                                                             list_faces[counter_aux][0][2],
                                                                                             self._list_faces_neighbors(list_faces),
-                                                                                            use_bert=self.use_bert)
+                                                                                            use_bert=self.use_bert,
+                                                                                            use_ktrain=self.use_ktrain)
                         list_idx_frames = np.delete(list_idx_frames,0)
                         
                 counter_aux += 1
@@ -372,7 +378,7 @@ class FrameExtractor():
 
             
             
-            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces), use_bert=self.use_bert)
+            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces), use_bert=self.use_bert, use_ktrain=self.use_ktrain)
             list_idx_frames = np.delete(list_idx_frames,0)
             list_idx_frames -= 1
         
