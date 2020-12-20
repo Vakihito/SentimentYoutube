@@ -862,9 +862,9 @@ def do_preparation(id, start_time=0, end_time=None, using_bert=True ,using_ktrai
   video.streams.get_by_itag(str(itag_max)).download()
 
   if lang != 'en':
-    extractor_obj = FrameExtractor(video.title,id,  start=start_time, end=end_time ,use_bert=using_bert, use_ktrain=False,video_length=video.length,frames_frequency=frames_t)
+    extractor_obj = FrameExtractor(video.title,id,  start=start_time, end=end_time ,use_bert=is_using_bert(), use_ktrain=False,video_length=video.length,frames_frequency=frames_t)
   else:
-    extractor_obj = FrameExtractor(video.title,id, start=start_time, end=end_time ,use_bert=using_bert, use_ktrain=using_ktrain,video_length=video.length,frames_frequency=frames_t)
+    extractor_obj = FrameExtractor(video.title,id, start=start_time, end=end_time ,use_bert=is_using_bert(), use_ktrain=using_ktrain,video_length=video.length,frames_frequency=frames_t)
 
   print(video.captions.all())
   for cap in video.captions.all():
