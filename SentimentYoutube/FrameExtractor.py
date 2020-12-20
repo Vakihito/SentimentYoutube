@@ -110,6 +110,7 @@ class FrameExtractor():
                 os.mkdir(self.video_dir)
                 print(f'Created the following directory: {self.video_dir}')
         
+        caption_counter = 0
         last_time_added = -1
         # counts the number of frames
         frame_cnt = 0
@@ -204,7 +205,6 @@ class FrameExtractor():
         while len(list_idx_frames) :
         
             shift(list_faces);
-            
             # iterating over backwards to since we need to maintain the order of the frames
             # sorted by descreasing time 
             for i in range(len(list_faces) - 1, -1,-1):
@@ -251,6 +251,8 @@ class FrameExtractor():
         while (self.start_time > self.captions_save[caption_counter].start):
             caption_counter += 1  
         
+            
+
         last_time_added = -1
         # counts the number of frames
         frame_cnt = 0
@@ -275,6 +277,8 @@ class FrameExtractor():
             
             # update the list_faces
             cur_second = int((frame_cnt / self.fps))
+            
+
             success,image = self.vid_cap.read() 
 
             if not success:
@@ -283,7 +287,7 @@ class FrameExtractor():
             
 
             # updates the first elemento of the list
-            shift(list_faces)
+            shift(list_faces);
             # makes a rotation right
             # update a our list 
             list_faces[0] = [[image, cur_second]]
@@ -291,9 +295,10 @@ class FrameExtractor():
             if (cur_second > self.end_time):
                 return
             if (cur_second >= self.start_time):
+                
                 bool_possible_key = (len(self.key_time) > caption_counter and
                                     cur_second ==  self.key_time[caption_counter])
-                # checking if the current time is alsi a key time
+                # checking if the current time is  a key time
                 if (bool_possible_key ):
                     last_time_added = list_faces[0][0][1]
                     list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
@@ -384,10 +389,8 @@ class FrameExtractor():
         
 
     def correlates_caption_frame(self):
-    #   print(self.time_frames.keys())
+      print(self.time_frames.keys())
       for cap in self.captions_save:
-        # print("cap.start : ", cap.start)
-        # print("cap.end : ", cap.end)
         if cap.start >= self.start_time and cap.end <= self.end_time:
             self.frames_captions.append(frame_caption(
                                         self.time_frames[cap.start],
@@ -690,10 +693,14 @@ class FrameExtractor():
         start_min_caption = self.captions_save[0].start
         # but I can't say the same for the max end
         end_max_caption = max([cap.end for cap in self.captions_save])
-
         start_min = min(start_min_caption, start_min_frame)
+        if start_min < self.start_time:
+          start_min = self.start_time
+        
         min_aux = start_min
-        end_max = max(end_max_caption, end_max_frame)
+        end_max = max(end_max_caption, end_max_frame, self.end_time)
+        if end_max > self.end_time:
+          end_max = self.end_time
 
         while start_min <= end_max:
           xC.append(start_min)
@@ -708,6 +715,8 @@ class FrameExtractor():
                 last = self.time_frames[start_min].feeling_ktrain
             else :
                 last = self.time_frames[start_min].feeling_ktrain_avg
+
+
           xF.append(start_min)
           yF.append(last)
           yFD.append(lastD)
@@ -722,6 +731,7 @@ class FrameExtractor():
             yT.append( consent_values( [yC[-1], yF[-1], yFD[-1]] ) )
           else:
             yT.append((yC[-1] * weightc ) + (yF[-1] * weightf) + (yFD[-1] * weightfd) )
+
         plt.plot(xC, yC, label="caption")
         plt.plot(xF, yF, label="frame")
         plt.plot(xF, yFD, label="frame d")
@@ -741,6 +751,12 @@ class FrameExtractor():
 
       else: 
         last = 0.0
+        if end_max_frame > self.end_time:
+          end_max_frame = self.end_time
+
+        if start_min_frame < self.start_time:
+          start_min_frame = self.start_time
+
         while start_min_frame <= end_max_frame:
           if start_min_frame in self.time_frames:
             lastD = self.time_frames[start_min_frame].feeling
@@ -805,8 +821,9 @@ class FrameExtractor():
       
       if self.has_caption:
           for cap in self.captions_save:
-            self.plot_sentiment_cap(cap.start, cap.end, cap.feeling, counter)
-            counter += 1
+            if (cap.start >= self.start_time and cap.end <= self.end_time):
+                self.plot_sentiment_cap(cap.start, cap.end, cap.feeling, counter)
+                counter += 1
 
         
       x = []
@@ -814,12 +831,13 @@ class FrameExtractor():
       yD = []
       if bool_frame:
         for timing in self.time_frames:
-          x.append(timing)
-          if consent_F:
-            yF.append(self.time_frames[timing].feeling_ktrain)
-          else:
-            yF.append(self.time_frames[timing].feeling_ktrain_avg)
-          yD.append(self.time_frames[timing].feeling)
+          if (timing >= self.start_time and timing <= self.end_time):
+            x.append(timing)
+            if consent_F:
+                yF.append(self.time_frames[timing].feeling_ktrain)
+            else:
+                yF.append(self.time_frames[timing].feeling_ktrain_avg)
+            yD.append(self.time_frames[timing].feeling)
 
         plt.plot(x, yF, 'rs',label="frame")
         plt.plot(x, yD, 'b.', label= "frame D")
@@ -828,8 +846,7 @@ class FrameExtractor():
         plt.ylabel('feeling')
         plt.title('time x feelling')
         plt.show()
-
-
+ 
 
 
 # does every preparation step before
