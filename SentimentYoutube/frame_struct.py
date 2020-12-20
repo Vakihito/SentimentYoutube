@@ -10,23 +10,26 @@ class frame_struct():
       description (str),
       felling (textBlob.sentiment),
     '''
-    def __init__(self, timeF,  pathF, faces_P, use_bert=True,neutral_range=0.05):
+    def __init__(self, timeF,  pathF, faces_P, use_bert=True, use_ktrain=True,neutral_range=0.05):
       # neutral_range - defines the range in wich the feeling on the frame description will be classified as neutral
       self.time = timeF
       self.path = pathF
       self.description = show_prediction(pathF)
  
       self.use_bert = use_bert
+      self.use_ktrain = use_ktrain
+      self.feeling = 0
 
-
-      self.feeling_ktrain_text = predict_text(self.description,method="IMDB",neutral_range=neutral_range) 
-
+      if use_ktrain:
+        self.feeling_ktrain_text = predict_text(self.description,method="IMDB",neutral_range=neutral_range) 
+        self.feeling = self.feeling_ktrain_text
       if use_bert:
         (aux_nearst_query, self.feeling_bert) = predict_text(self.description,method="Bert",only_sentiment=False,neutral_range=neutral_range) 
-        self.feeling = (self.feeling_ktrain_text + self.feeling_bert)/2
+        self.feeling = self.feeling_bert
         self.nearst_query = aux_nearst_query.loc[0]
-      else:
-        self.feeling = self.feeling_ktrain_text
+
+      if (use_ktrain and use_bert):
+          self.feeling = (self.feeling_ktrain_text + self.feeling_bert)/2
         
       self.feeling_ktrain = 0
       self.feeling_ktrain_avg = 0
@@ -60,9 +63,9 @@ class frame_struct():
         self.show_img()
       print("description : ", self.description)
       print("Feeling AVG :", self.feeling)
-      
-      if self.use_bert:
+      if self.use_ktrain:
         print("Feeling text ktrain : ", self.feeling_ktrain_text)
+      if self.use_bert:
         print("Feeling text bert : ", self.feeling_bert)
         print("Nearst query lang : ", self.nearst_query["lang"])
         print("Nearst query string : ", self.nearst_query["word"])

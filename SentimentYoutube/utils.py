@@ -63,8 +63,17 @@ def consent_values(sentiment_list):
                 return 0
     return sum(lista_sent)
 
-def shift(seq, n):
-    return seq[n:]+seq[:n]
+def shift(lista_aux1):
+  aux1 = lista_aux1[-1]
+  B = lista_aux1[0] 
+  for i in range(len(lista_aux1) - 1):
+    A = lista_aux1[i + 1]
+    lista_aux1[i+1] = B
+    B = A
+
+  lista_aux1[0] = aux1
+
+
 
 def prop_of_having_face(path,confidence_arg=0.8,save_img=False,show_img=False,show_crop=False):
     image = cv2.imread(path)
@@ -91,7 +100,7 @@ def prop_of_having_face(path,confidence_arg=0.8,save_img=False,show_img=False,sh
         # filter out weak detections by ensuring the `confidence` is
         # greater than the minimum confidence
         if certeza < confidence:
-                certeza = confidence
+            certeza = confidence
         if confidence > confidence_arg:
             # compute the (x, y)-coordinates of the bounding box for the
             # object
@@ -137,6 +146,8 @@ def prop_of_having_face(path,confidence_arg=0.8,save_img=False,show_img=False,sh
         return (crop_list,certeza)
     return certeza
 
+
+
 def average(lista):
   if len(lista) == 0:
     return 0
@@ -157,6 +168,7 @@ def show_prediction(ulr):
     answer = demo.caption_processor(tokens.tolist()[0])["caption"]
     return answer
 
+
 # receives the seconds as a int and return a string in HH:MM:SS
 def seconds_to_time(sec):
   seconds = int(sec)
@@ -175,9 +187,8 @@ def seconds_to_time(sec):
     sec = '0' + seconds
   return hours + ':' + min + ':' + seconds
 
-# Predicts a face in a image (positive or negative )
-def predict_face(path, return_proba=True):
-    prob = predictor_face.predict_filename(path, return_proba=return_proba)[0]
+def predict_face(path):
+    prob = predictor_face.predict_filename(path, return_proba=True)[0]
     size_prob = len(prob)
     maxi = 0
     max_idx = -1
@@ -195,6 +206,7 @@ def predict_face(path, return_proba=True):
         return maxi
     return 0
 
+
 def IMDB(text, neutral_range=0.05):
 
     prob_ktrain = predictor_text.predict(text, return_proba=True)
@@ -202,6 +214,7 @@ def IMDB(text, neutral_range=0.05):
     if feeling < neutral_range and -neutral_range < feeling:
         feeling = 0
     return feeling
+
 
 def Bert(text, only_sentiment=True, max_query=1.5, neutral_range=0.05):
 
@@ -213,7 +226,7 @@ def Bert(text, only_sentiment=True, max_query=1.5, neutral_range=0.05):
         return sentiment
     return (df_lexico_result , sentiment)
 
-# predicts text
+
 def predict_text(text, method="IMDB", only_sentiment=True, max_query=1.5, neutral_range=0.05):
     if method == "IMDB":
         return IMDB(text,neutral_range)
@@ -236,22 +249,18 @@ def show_image_url(ulr):
     return img
 
 
-## this functions should not be used for now ##
-
-
 def explain_frame(path, crop_faces=True):
     show_image(path)
     if (crop_faces):
+        print("entrei")
         (faces, _) = prop_of_having_face(path,save_img=True,show_img=True)
+        print(faces)
     for face in faces:
         plt.imshow( predictor_face.explain(face))
         plt.show()
         print("The feeling on this face is :", predictor_face.predict_filename(face)[0])
     frame_des = show_prediction(path)
     return predictor_text.explain(frame_des)
-
-# this functions should not be used for now ##
-
 
 def explain_text(text):
     return predictor_text.explain(text)

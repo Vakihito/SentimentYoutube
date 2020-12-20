@@ -20,7 +20,7 @@ class FrameExtractor():
     '''
     Class used for extracting frames from a video file.
     '''
-    def __init__(self, video_name, video_id,video_length, use_bert=False ,video_path="/content/vqa-maskrcnn-benchmark/", video_dir="/content/vqa-maskrcnn-benchmark/dataset/", frames_frequency=200):
+    def __init__(self, video_name, video_id, video_length, start=0, end=None ,use_bert=False, use_ktrain=True,video_path="/content/vqa-maskrcnn-benchmark/", video_dir="./dataset/", frames_frequency=200):
         self.video_name = safe_filename(video_name)
         self.video_id = video_id
         self.video_path = video_path + self.video_name + ".mp4"
@@ -28,7 +28,15 @@ class FrameExtractor():
         self.video_len = video_length
         self.img_name = self.video_name + "_img"
 
+        if end == None:
+            self.start_time = start
+            self.end_time = self.video_len
+        else :
+            self.start_time = start
+            self.end_time = end
+
         self.use_bert = use_bert
+        self.use_ktrain = use_ktrain
 
         self.frames_frequency = frames_frequency
         self.vid_cap = cv2.VideoCapture(self.video_path)
@@ -63,12 +71,15 @@ class FrameExtractor():
             # comment type
             if (line_counter + 1) % 4  == 0 and self.video_len >= time_e:  
                 string_cap = line
-                self.captions_save.append(caption_struct(time_s, time_e, string_cap, use_bert=self.use_bert))
+                self.captions_save.append(caption_struct(time_s, time_e, string_cap, use_bert=self.use_bert, use_ktrain=self.use_ktrain))
                 self.key_time.append(time_s)
                 self.key_time.append(time_e)
             line_counter += 1
 
         self.key_time = sorted(set(self.key_time))
+
+
+
 
     def _list_faces_neighbors(self, list_faces):
         list_r = []
@@ -85,7 +96,10 @@ class FrameExtractor():
         return img_path
     
 
+        
+
     def extract_frames_no_caption(self, img_ext='.jpg',prob_f=0.8,by_frame=False):
+        # print(self.key_time)
         if not self.vid_cap.isOpened():
             self.vid_cap = cv2.VideoCapture(self.video_path)
         
@@ -125,67 +139,70 @@ class FrameExtractor():
 
             if not success:
                 break
-
+            # print("cur_time : ",cur_second)
             # updates the first elemento of the list
-            list_faces = shift(list_faces,-1);
+            shift(list_faces);
             # makes a rotation right
             # update a our list 
             list_faces[0] = [[image, cur_second]]
             
-            if (frame_cnt % self.frames_frequency == 0 and last_time_added != list_faces[0][0][1]):
-                list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
+            if (cur_second > self.end_time):
+                return
+            if (cur_second >= self.start_time):
+                if (counter_aux % self.frames_frequency == 0 and last_time_added != list_faces[0][0][1]):
+                    list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
 
-            if (len(list_idx_frames) > 0):
-                # iterating over backwards to since we need to maintain the order of the frames
-                # sorted by descreasing time 
-                for i in range(len(list_faces) - 1, -1,-1):
-                    #saving each frame if was not saved
-                    # so the firs element of a list of a  list_faces, will be [image, cur sencond, ]
-                    # follow by some faces_images
+                if (len(list_idx_frames) > 0):
+                    # iterating over backwards to since we need to maintain the order of the frames
+                    # sorted by descreasing time 
+                    for i in range(len(list_faces) - 1, -1,-1):
+                        #saving each frame if was not saved
+                        # so the firs element of a list of a  list_faces, will be [image, cur sencond, ]
+                        # follow by some faces_images
 
-                    # checks if the element was already processed ( the img was writen )
-                    # if not writes the image 
-                    if isinstance(list_faces[i], list) and len(list_faces[i][0]) < 3:
-                        
-                        path_img = self._create_img(list_faces[i][0][0], img_cnt, img_ext)
-                        list_faces[i][0] +=  [path_img]
+                        # checks if the element was already processed ( the img was writen )
+                        # if not writes the image 
+                        if isinstance(list_faces[i], list) and len(list_faces[i][0]) < 3:
+                            
+                            path_img = self._create_img(list_faces[i][0][0], img_cnt, img_ext)
+                            list_faces[i][0] +=  [path_img]
 
-                        img_cnt += 1
+                            img_cnt += 1
+                            
+                            # checking if was not processed (faces in te frames)
+                            # so list_faces[i] will be [[image, cur sencond, path]] if we din't check for faces in the past
+                            (list_aux1, _) = prop_of_having_face(list_faces[i][0][2],confidence_arg=prob_f,save_img=True)
+                            list_faces[i] += list_aux1
+                            
                         
-                        # checking if was not processed (faces in te frames)
-                        # so list_faces[i] will be [[image, cur sencond, path]] if we din't check for faces in the past
-                        (list_aux1, _) = prop_of_having_face(list_faces[i][0][2],confidence_arg=prob_f,save_img=True)
-                        list_faces[i] += list_aux1
-                        
+                    # update the list of frames
+                    list_idx_frames -= 1
+
                     
-                # update the list of frames
-                list_idx_frames -= 1
 
-                
-
-                # checks if the value is possible to create 
-                if (list_idx_frames[0] == 0 ):
-                    if (counter_aux >= mid_value):
-                        self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
-                                                                                        list_faces[mid_value][0][2],
-                                                                                        self._list_faces_neighbors(list_faces),
-                                                                                        use_bert=self.use_bert)
-                    else :
-                        print(counter_aux)
-                        self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
-                                                                                        list_faces[counter_aux][0][2],
-                                                                                        self._list_faces_neighbors(list_faces),
-                                                                                        use_bert=self.use_bert)
-                    list_idx_frames = np.delete(list_idx_frames,0)
-                    
+                    # checks if the value is possible to create 
+                    if (list_idx_frames[0] == 0 ):
+                        if (counter_aux >= mid_value):
+                            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
+                                                                                            list_faces[mid_value][0][2],
+                                                                                            self._list_faces_neighbors(list_faces),
+                                                                                            use_bert=self.use_bert)
+                        else :
+                            print(counter_aux)
+                            self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
+                                                                                            list_faces[counter_aux][0][2],
+                                                                                            self._list_faces_neighbors(list_faces),
+                                                                                            use_bert=self.use_bert)
+                        list_idx_frames = np.delete(list_idx_frames,0)
+                        
+                counter_aux += 1
             frame_cnt += 1
-            counter_aux += 1
         self.vid_cap.release()
         cv2.destroyAllWindows()
-      
+    
         while len(list_idx_frames) :
         
-            shift(list_faces, -1)
+            shift(list_faces);
             
             # iterating over backwards to since we need to maintain the order of the frames
             # sorted by descreasing time 
@@ -214,6 +231,10 @@ class FrameExtractor():
             list_idx_frames = np.delete(list_idx_frames,0)
             list_idx_frames -= 1
 
+
+        
+        
+        
     def extract_frames_caption(self, img_ext='.jpg',prob_f=0.8,by_frame=False):
         if not self.vid_cap.isOpened():
             self.vid_cap = cv2.VideoCapture(self.video_path)
@@ -254,78 +275,79 @@ class FrameExtractor():
 
             if not success:
                 break
+            
+            
 
             # updates the first elemento of the list
-            list_faces = shift(list_faces,-1);
+            shift(list_faces)
             # makes a rotation right
             # update a our list 
             list_faces[0] = [[image, cur_second]]
 
-            
-            
-            
-            
-            bool_possible_key = (len(self.key_time) > caption_counter and
-                                cur_second ==  self.key_time[caption_counter])
-            # checking if the current time is alsi a key time
-            if (bool_possible_key ):
-                last_time_added = list_faces[0][0][1]
-                list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
-                caption_counter += 1
-            elif (frame_cnt % self.frames_frequency == 0 and last_time_added != list_faces[0][0][1]):
-                list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
+            if (cur_second > self.end_time):
+                return
+            if (cur_second >= self.start_time):
+                bool_possible_key = (len(self.key_time) > caption_counter and
+                                    cur_second ==  self.key_time[caption_counter])
+                # checking if the current time is alsi a key time
+                if (bool_possible_key ):
+                    last_time_added = list_faces[0][0][1]
+                    list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
+                    caption_counter += 1
+                elif (counter_aux % self.frames_frequency == 0 and last_time_added != list_faces[0][0][1]):
+                    list_idx_frames = np.append(list_idx_frames,[mid_value + 1])
 
-            if (len(list_idx_frames) > 0):
-                # iterating over backwards to since we need to maintain the order of the frames
-                # sorted by descreasing time 
-                for i in range(len(list_faces) - 1, -1,-1):
-                    #saving each frame if was not saved
-                    # so the firs element of a list of a  list_faces, will be [image, cur sencond, ]
-                    # follow by some faces_images
+                if (len(list_idx_frames) > 0):
+                    # iterating over backwards to since we need to maintain the order of the frames
+                    # sorted by descreasing time 
+                    for i in range(len(list_faces) - 1, -1,-1):
+                        #saving each frame if was not saved
+                        # so the firs element of a list of a  list_faces, will be [image, cur sencond, ]
+                        # follow by some faces_images
 
-                    # checks if the element was already processed ( the img was writen )
-                    # if not writes the image 
-                    if isinstance(list_faces[i], list) and len(list_faces[i][0]) < 3:
-                        
-                        path_img = self._create_img(list_faces[i][0][0], img_cnt, img_ext)
-                        list_faces[i][0] +=  [path_img]
+                        # checks if the element was already processed ( the img was writen )
+                        # if not writes the image 
+                        if isinstance(list_faces[i], list) and len(list_faces[i][0]) < 3:
+                            
+                            path_img = self._create_img(list_faces[i][0][0], img_cnt, img_ext)
+                            list_faces[i][0] +=  [path_img]
 
-                        img_cnt += 1
+                            img_cnt += 1
+                            
+                            # checking if was not processed (faces in te frames)
+                            # so list_faces[i] will be [[image, cur sencond, path]] if we din't check for faces in the past
+                            (list_aux1, _) = prop_of_having_face(list_faces[i][0][2],confidence_arg=prob_f,save_img=True)
+                            list_faces[i] += list_aux1
+                            
                         
-                        # checking if was not processed (faces in te frames)
-                        # so list_faces[i] will be [[image, cur sencond, path]] if we din't check for faces in the past
-                        (list_aux1, _) = prop_of_having_face(list_faces[i][0][2],confidence_arg=prob_f,save_img=True)
-                        list_faces[i] += list_aux1
-                        
+                    # update the list of frames
+                    list_idx_frames -= 1
+
                     
-                # update the list of frames
-                list_idx_frames -= 1
 
-                
-
-                # checks if the value is possible to create 
-                if (list_idx_frames[0] == 0 ):
-                    if (counter_aux >= mid_value):
-                        self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
-                                                                                        list_faces[mid_value][0][2],
-                                                                                        self._list_faces_neighbors(list_faces),
-                                                                                        use_bert=self.use_bert)
-                    else :
-                        print(counter_aux)
-                        self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
-                                                                                        list_faces[counter_aux][0][2],
-                                                                                        self._list_faces_neighbors(list_faces),
-                                                                                        use_bert=self.use_bert)
-                    list_idx_frames = np.delete(list_idx_frames,0)
-                    
+                    # checks if the value is possible to create 
+                    if (list_idx_frames[0] == 0 ):
+                        if (counter_aux >= mid_value):
+                            self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],
+                                                                                            list_faces[mid_value][0][2],
+                                                                                            self._list_faces_neighbors(list_faces),
+                                                                                            use_bert=self.use_bert)
+                        else :
+                            print(counter_aux)
+                            self.time_frames[list_faces[counter_aux][0][1]] = frame_struct(list_faces[counter_aux][0][1],
+                                                                                            list_faces[counter_aux][0][2],
+                                                                                            self._list_faces_neighbors(list_faces),
+                                                                                            use_bert=self.use_bert)
+                        list_idx_frames = np.delete(list_idx_frames,0)
+                        
+                counter_aux += 1
             frame_cnt += 1
-            counter_aux += 1
         self.vid_cap.release()
         cv2.destroyAllWindows()
       
         while len(list_idx_frames) :
         
-            shift(list_faces, -1);
+            shift(list_faces);
             
             # iterating over backwards to since we need to maintain the order of the frames
             # sorted by descreasing time 
@@ -353,13 +375,18 @@ class FrameExtractor():
             self.time_frames[list_faces[mid_value][0][1]] = frame_struct(list_faces[mid_value][0][1],list_faces[mid_value][0][2], self._list_faces_neighbors(list_faces), use_bert=self.use_bert)
             list_idx_frames = np.delete(list_idx_frames,0)
             list_idx_frames -= 1
+        
 
     def correlates_caption_frame(self):
+    #   print(self.time_frames.keys())
       for cap in self.captions_save:
-        self.frames_captions.append(frame_caption(
-                                    self.time_frames[cap.start],
-                                    self.time_frames[cap.end],
-                                    cap))
+        # print("cap.start : ", cap.start)
+        # print("cap.end : ", cap.end)
+        if cap.start >= self.start_time and cap.end <= self.end_time:
+            self.frames_captions.append(frame_caption(
+                                        self.time_frames[cap.start],
+                                        self.time_frames[cap.end],
+                                        cap))
         # gets the time of each frame generated
       list_frames_times = list(self.time_frames.keys())
       
@@ -435,9 +462,13 @@ class FrameExtractor():
             self.time_frames[min_f].feeling_ktrain_avg = self.time_frames[min_f].feeling_ktrain_avg / max_value_frame_ktrain_avg
 
 
+
           
 
     def show_descriptions_frames_with_caption(self, show_img=True):
+        if (not self.has_caption ):
+            self.show_descriptions_from_all_frames()
+
         for frame_cap in self.frames_captions:
           if frame_cap.caption != None:
             frame_cap.caption.printC()
@@ -477,6 +508,7 @@ class FrameExtractor():
           print("positivity : ", sigmoid(self.time_frames[time_of_frame].feeling))
           print("\n############################################\n")
           numberFrame += 1
+
 
     def sum_the_positivity_of_vid_consent(self):
       xC = []
@@ -532,18 +564,24 @@ class FrameExtractor():
       
       return sum(yT)
 
-    def sum_the_positivity_of_vid(self, weightc=0.6, weightf=0.2, apart=False):
+    def sum_the_positivity_of_vid(self, weightc=0.6, weightf=0.2, apart=False,consent=True):
+
+      if consent:
+          return self.sum_the_positivity_of_vid_consent()
+
       weightfd= 1 - (weightc + weightf)
       
       somaF = 0
       somaFD = 0
       somaC = 0
 
+      somaT = 0
 
 
       for time_of_frame in self.time_frames:        
         somaF += self.time_frames[time_of_frame].feeling_ktrain 
         somaFD += self.time_frames[time_of_frame].feeling
+        
             
       
       if (not self.has_caption):
@@ -613,6 +651,7 @@ class FrameExtractor():
     # and plots, for example I'm using the average function, which takes a list and return a the average of the list
     # pCap the part of the caption that we will considere
     # pFrame the part of the frame that we will considere
+    # consent defines the classifications diverge returns neutral.
     def create_time_siries(self, weightc=0.6, weightf=0.2, consent_F=True ,consent=True):
       weightfd = 1 - weightf
       if (self.has_caption):
@@ -655,7 +694,8 @@ class FrameExtractor():
           yC.append( average( self.get_intervale_sentiment_caption(start_min)))
           if start_min in self.time_frames:
             lastD = self.time_frames[start_min].feeling
-            lastFIMDB = self.time_frames[start_min].feeling_ktrain_text
+            if self.use_ktrain:
+                lastFIMDB = self.time_frames[start_min].feeling_ktrain_text
             if self.use_bert:
                 lastFBert = self.time_frames[start_min].feeling_bert
             if (consent_F):
@@ -665,8 +705,8 @@ class FrameExtractor():
           xF.append(start_min)
           yF.append(last)
           yFD.append(lastD)
-          yFIMDB.append(lastFIMDB)
-          
+          if self.use_ktrain:
+            yFIMDB.append(lastFIMDB)
           if self.use_bert:
             yFBert.append(lastFBert)
           
@@ -679,7 +719,9 @@ class FrameExtractor():
         plt.plot(xC, yC, label="caption")
         plt.plot(xF, yF, label="frame")
         plt.plot(xF, yFD, label="frame d")
-        plt.plot(xF, yFIMDB, label="frame IMDB")
+        
+        if self.use_ktrain:
+            plt.plot(xF, yFIMDB, label="frame IMDB")
         
         if self.use_bert:
             plt.plot(xF, yFBert, label="frame Bert")
@@ -696,7 +738,8 @@ class FrameExtractor():
         while start_min_frame <= end_max_frame:
           if start_min_frame in self.time_frames:
             lastD = self.time_frames[start_min_frame].feeling
-            lastFIMDB = self.time_frames[start_min_frame].feeling_ktrain_text
+            if self.use_ktrain:
+                lastFIMDB = self.time_frames[start_min_frame].feeling_ktrain_text
             if self.use_bert:
                 lastFBert = self.time_frames[start_min_frame].feeling_bert
             if (consent_F):
@@ -706,20 +749,24 @@ class FrameExtractor():
           xF.append(start_min_frame)
           yF.append(last)
           yFD.append(lastD)
-          yFIMDB.append(lastFIMDB)
+          
+          if self.use_ktrain:
+            yFIMDB.append(lastFIMDB)
           if self.use_bert:
             yFBert.append(lastFBert)
 
           if (consent):
             yT.append( consent_values( [yF[-1], yFD[-1]] ) )
           else:
-            yT.append( (yF[-1] * weightf) + (yFD[-1] * weightfd) )
+            yT.append( (yF[-1] * weightf) + (yFD[-1] * weightfd))
           
           start_min_frame += 1
         
         plt.plot(xF, yF, label="frame")
         plt.plot(xF, yFD, label="frame d")
-        plt.plot(xF, yFIMDB, label="frame IMDB")
+
+        if self.use_ktrain:
+            plt.plot(xF, yFIMDB, label="frame IMDB")
         if self.use_bert:
             plt.plot(xF, yFBert, label="frame Bert")
 
@@ -777,10 +824,12 @@ class FrameExtractor():
         plt.show()
 
 
+
+
 # does every preparation step before
-def do_preparation(id ,lang='en', frames_t=200):
-  if frames_t < 2:
-    print("\033[93merror, frame rate is less than minimum (2)\x1b[0m")
+def do_preparation(id, start_time=0, end_time=None, using_bert=True ,using_ktrain=True ,lang='en', frames_t=200):
+  if frames_t < 10:
+    print("\033[93merror, frame rate is less than minimum (10)\x1b[0m")
     return []
   
   ulr_to_download = 'https://www.youtube.com/watch?v=' + id
@@ -788,6 +837,19 @@ def do_preparation(id ,lang='en', frames_t=200):
   print("downloading the video from the ulr : ", ulr_to_download)
   video = YouTube(ulr_to_download)
 
+  
+  if  start_time == end_time or start_time < 0 :
+    print("\033[91mError : invalid time range\033[0m")
+    return 1
+
+  if end_time == None:
+    print("extracting from: ", start_time, "s to ", video.length, "s")
+  else:
+    if end_time > video.length or end_time < start_time:
+        print("\033[91mError : invalid time range\033[0m")
+        return 1
+    print("extracting from: ", start_time, "s to ", end_time, "s")
+    
   
   
 
@@ -799,10 +861,13 @@ def do_preparation(id ,lang='en', frames_t=200):
           itag_max = stream.itag 
   video.streams.get_by_itag(str(itag_max)).download()
 
-  extractor_obj = FrameExtractor(video.title,id, use_bert=is_using_bert(),video_length=video.length,frames_frequency=frames_t)
+  if lang != 'en':
+    extractor_obj = FrameExtractor(video.title,id,  start=start_time, end=end_time ,use_bert=using_bert, use_ktrain=False,video_length=video.length,frames_frequency=frames_t)
+  else:
+    extractor_obj = FrameExtractor(video.title,id, start=start_time, end=end_time ,use_bert=using_bert, use_ktrain=using_ktrain,video_length=video.length,frames_frequency=frames_t)
 
+  print(video.captions.all())
   for cap in video.captions.all():
-
     if cap.code == lang:
       extractor_obj.has_caption = True
 
