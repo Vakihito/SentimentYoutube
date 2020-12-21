@@ -3,7 +3,7 @@
 ### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples)  | [Installation](#installation) | [References](#references) 
 
 <p align="center">
-<img src="https://github.com/Vakihito/SentimentYoutube/blob/main/Logo.png?raw=true" width="100"/>
+<img src="https://github.com/Vakihito/SentimentYoutube/blob/main/darkLogo.png?raw=true" width="100"/>
 </p>
 
 
