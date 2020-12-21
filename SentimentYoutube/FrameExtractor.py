@@ -665,8 +665,6 @@ class FrameExtractor():
       weightfd = 1 - weightf
       if (self.has_caption):
           weightfd = 1 - ( weightc + weightf )
-      if start_plt_time >= end_plt_time:
-          return False
 
       rc('figure', figsize=(20, 10))
       xC = []
@@ -683,6 +681,8 @@ class FrameExtractor():
       def_time_end = self.end_time
       if end_plt_time != None: 
         def_time_end = min(self.end_time, end_plt_time) 
+      if start_plt_time >= end_plt_time:
+          return False
 
       last = 0.0
       lastD = 0.0
@@ -822,8 +822,6 @@ class FrameExtractor():
       plt.plot(x, y, label="caption" + str(counter))
 
     def plot_caption_sentiment_during_time(self, start_plt_time=0.0, end_plt_time=None,consent_F=True,bool_frame=True):
-      if start_plt_time >= end_plt_time:
-          return False
 
       counter = 0
       rc('figure', figsize=(20, 10))
@@ -832,6 +830,8 @@ class FrameExtractor():
       def_time_end = self.end_time
       if end_plt_time != None: 
         def_time_end = min(self.end_time, end_plt_time) 
+      if start_plt_time >= end_plt_time:
+          return False
 
       if self.has_caption:
           for cap in self.captions_save:
