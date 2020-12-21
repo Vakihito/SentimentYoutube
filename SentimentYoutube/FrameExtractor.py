@@ -681,7 +681,7 @@ class FrameExtractor():
       def_time_end = self.end_time
       if end_plt_time != None: 
         def_time_end = min(self.end_time, end_plt_time) 
-      if start_plt_time >= end_plt_time:
+      if start_plt_time >= def_time_end:
           return False
 
       last = 0.0
@@ -830,7 +830,7 @@ class FrameExtractor():
       def_time_end = self.end_time
       if end_plt_time != None: 
         def_time_end = min(self.end_time, end_plt_time) 
-      if start_plt_time >= end_plt_time:
+      if start_plt_time >= def_time_end:
           return False
 
       if self.has_caption:
