@@ -656,16 +656,18 @@ class FrameExtractor():
       return sentiments
 
 
-    # applies the function in a set of sentiments in a espefic time
+# applies the function in a set of sentiments in a espefic time
     # and plots, for example I'm using the average function, which takes a list and return a the average of the list
     # pCap the part of the caption that we will considere
     # pFrame the part of the frame that we will considere
     # consent defines the classifications diverge returns neutral.
-    def create_time_siries(self, weightc=0.6, weightf=0.2, consent_F=True ,consent=True):
+    def create_time_siries(self, start_plt_time=0.0, end_plt_time=None, weightc=0.6, weightf=0.2, consent_F=True ,consent=True):
       weightfd = 1 - weightf
       if (self.has_caption):
           weightfd = 1 - ( weightc + weightf )
-      
+      if start_plt_time >= end_plt_time:
+          return False
+
       rc('figure', figsize=(20, 10))
       xC = []
       yC = []
@@ -677,6 +679,10 @@ class FrameExtractor():
       yFBert = []
       yT = []
 
+      def_time_start = max(self.start_time, start_plt_time)
+      def_time_end = self.end_time
+      if end_plt_time != None: 
+        def_time_end = min(self.end_time, end_plt_time) 
 
       last = 0.0
       lastD = 0.0
@@ -694,13 +700,13 @@ class FrameExtractor():
         # but I can't say the same for the max end
         end_max_caption = max([cap.end for cap in self.captions_save])
         start_min = min(start_min_caption, start_min_frame)
-        if start_min < self.start_time:
-          start_min = self.start_time
+        if start_min < def_time_start:
+          start_min = def_time_start
         
         min_aux = start_min
-        end_max = max(end_max_caption, end_max_frame, self.end_time)
-        if end_max > self.end_time:
-          end_max = self.end_time
+        end_max = max(end_max_caption, end_max_frame, def_time_end)
+        if end_max > def_time_end:
+          end_max = def_time_end
 
         while start_min <= end_max:
           xC.append(start_min)
@@ -751,11 +757,11 @@ class FrameExtractor():
 
       else: 
         last = 0.0
-        if end_max_frame > self.end_time:
-          end_max_frame = self.end_time
+        if end_max_frame > def_time_end:
+          end_max_frame = def_time_end
 
-        if start_min_frame < self.start_time:
-          start_min_frame = self.start_time
+        if start_min_frame < def_time_start:
+          start_min_frame = def_time_start
 
         while start_min_frame <= end_max_frame:
           if start_min_frame in self.time_frames:
@@ -815,13 +821,21 @@ class FrameExtractor():
         aux_value += 0.5
       plt.plot(x, y, label="caption" + str(counter))
 
-    def plot_caption_sentiment_during_time(self, consent_F=True,bool_frame=True):
+    def plot_caption_sentiment_during_time(self, start_plt_time=0.0, end_plt_time=None,consent_F=True,bool_frame=True):
+      if start_plt_time >= end_plt_time:
+          return False
+
       counter = 0
       rc('figure', figsize=(20, 10))
       
+      def_time_start = max(self.start_time, start_plt_time)
+      def_time_end = self.end_time
+      if end_plt_time != None: 
+        def_time_end = min(self.end_time, end_plt_time) 
+
       if self.has_caption:
           for cap in self.captions_save:
-            if (cap.start >= self.start_time and cap.end <= self.end_time):
+            if (cap.start >= def_time_start and cap.end <= def_time_end):
                 self.plot_sentiment_cap(cap.start, cap.end, cap.feeling, counter)
                 counter += 1
 
@@ -831,7 +845,7 @@ class FrameExtractor():
       yD = []
       if bool_frame:
         for timing in self.time_frames:
-          if (timing >= self.start_time and timing <= self.end_time):
+          if (timing >= def_time_start and timing <= def_time_end):
             x.append(timing)
             if consent_F:
                 yF.append(self.time_frames[timing].feeling_ktrain)
@@ -884,7 +898,7 @@ def do_preparation(id, start_time=0, end_time=None, using_bert=True ,using_ktrai
           itag_max = stream.itag 
   video.streams.get_by_itag(str(itag_max)).download()
 
-  if lang != 'en':
+  if lang != 'en' and lang != 'a.en':
     extractor_obj = FrameExtractor(video.title,id,  start=start_time, end=end_time ,use_bert=is_using_bert(), use_ktrain=False,video_length=video.length,frames_frequency=frames_t)
   else:
     extractor_obj = FrameExtractor(video.title,id, start=start_time, end=end_time ,use_bert=is_using_bert(), use_ktrain=using_ktrain,video_length=video.length,frames_frequency=frames_t)
