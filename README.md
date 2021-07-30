@@ -54,6 +54,7 @@ Please see the following examples notebooks for a guide on how to use **Sentimen
     
 - **How to use** : [Introduction](https://colab.research.google.com/drive/1JEmHlvQ2CFP6Zwdoi1TQyu_Fjzb7J2kW?usp=sharing)
 - **Using Explain** : [Explain Notebook](https://colab.research.google.com/drive/1EWV1Qss2IxqUReJe1GO4N0AyUviZGCeZ?usp=sharing)
+- **Example of the application** : [video](https://studio.youtube.com/video/eWX21QAbqNE/edit)
 
 ---
 
