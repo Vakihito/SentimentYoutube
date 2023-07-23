@@ -10,7 +10,7 @@
 # Welcome to SentimentYoutube
 
 ### News and Announcements
-- **2020-10-20**
+- **2022-06-20**
     - First release of SentimentYoutube ! Version **0.0.1** cames with a simple way to analyze sentiment through out the video, it's not working properly, but defines the start of project by analysing both the frame and the caption of the video.
 
 ----
