@@ -22,7 +22,7 @@ Check a sample notebook via the following notebook : [![Open In Colab](https://c
 
 
 <p align="center">
-   <img src="https://github.com/Vakihito/SentimentYoutube/blob/main/videos/uni%2Bmulti.gif" width="150" />
+   <img src="https://github.com/Vakihito/SentimentYoutube/blob/main/videos/uni%2Bmulti.gif" width="500" />
 </p>
 
 
