@@ -20,6 +20,12 @@
 This library uses Ktrain in order to train models and load models, and also uses pythia to describe a frame. 
 Check a sample notebook via the following notebook : [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1JbpNR48BPwcKNeNexkFpp8aXqdq5zBt7/view?usp=sharing)
 
+
+<p align="center">
+   <img src="https://github.com/Vakihito/SentimentYoutube/blob/main/videos/uni%2Bmulti.gif" width="150" />
+</p>
+
+
 - In order to use this library, please take a look at it's classes :
     - 'PythiaDemo'  :
         - **PythiaDemon()** - The main utility of this class is to describe a given image, this class is called in Utils to make the process easier. 
