@@ -58,8 +58,9 @@ Please see the following tutorial notebooks for a guide on how to use **Sentimen
 ---
 ### Examples
 Please see the following examples notebooks for a guide on how to use **SentimentYoutube** on your projects:
-    
-- **How to use** : [Introduction](https://colab.research.google.com/drive/1JEmHlvQ2CFP6Zwdoi1TQyu_Fjzb7J2kW?usp=sharing)
+
+- **Sentiment Analisys video** : [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://drive.google.com/file/d/1JbpNR48BPwcKNeNexkFpp8aXqdq5zBt7/view?usp=sharing)
+- **Sentiment Analisys time series** : [Introduction](https://colab.research.google.com/drive/1JEmHlvQ2CFP6Zwdoi1TQyu_Fjzb7J2kW?usp=sharing)
 - **Using Explain** : [Explain Notebook](https://colab.research.google.com/drive/1EWV1Qss2IxqUReJe1GO4N0AyUviZGCeZ?usp=sharing)
 - **Example of the application** : [Video](https://studio.youtube.com/video/eWX21QAbqNE/edit)
 
