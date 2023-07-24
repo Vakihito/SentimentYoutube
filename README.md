@@ -3,7 +3,7 @@
 ### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples)  | [Installation](#installation) | [References](#references) 
 
 <p align="center">
-<img src="https://anonymous.4open.science/api/repo/SentimentYoutube-BF28/file/darkLogo.png" width="100"/>
+<img src="./darkLogo.png" width="100"/>
 </p>
 
 
@@ -22,7 +22,7 @@ Check a sample notebook via the following notebook : [![Open In Colab](https://c
 
 
 <p align="center">
-   <img src="https://github.com/Vakihito/SentimentYoutube/blob/main/videos/uni%2Bmulti.gif" width="500" />
+   <img src="./videos/uni%2Bmulti.gif" width="500" />
 </p>
 
 
