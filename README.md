@@ -3,7 +3,7 @@
 ### [Overview](#overview) | [Tutorials](#tutorials) | [Examples](#examples)  | [Installation](#installation) | [References](#references) 
 
 <p align="center">
-<img src="https://anonymous.4open.science/r/SentimentYoutube-BF28/darkLogo.png" width="100"/>
+<img src="./darkLogo.png" width="100"/>
 </p>
 
 
